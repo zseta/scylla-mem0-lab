@@ -1,7 +1,7 @@
 """The ScyllaDB Plushie Shop: catalogue, policies and the bot's base prompt."""
 
 SHOP_NAME = "ScyllaDB Plushie Shop"
-BOT_NAME = "Scyla"
+BOT_NAME = "plushie-bot"
 
 CATALOGUE = """\
 - Scylla Plushie, Small (20 cm): $19

@@ -1,6 +1,6 @@
 # 00 · Run the support bot (no memory)
 
-Meet **Scyla**, the support bot of the ScyllaDB Plushie Shop. It runs on Gemini and answers questions about orders, shipping and returns.
+Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on Gemini and answers questions about orders, shipping and returns.
 
 It has no memory. Each reply sees only the messages of the current ticket. When the customer opens a new ticket, the bot starts from zero. That is the problem this workshop solves.
 
