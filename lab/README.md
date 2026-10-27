@@ -58,9 +58,9 @@ Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 
 ## Instruqt
 
-`../instruqt/` holds the track: one VM (`workstation`), one challenge with every exercise, tabs **Terminal**, **Terminal 2** and **App** (port 8501), no check scripts.
+`../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2** and **App** (port 8501), no check scripts.
 
-- `track_scripts/setup-workstation` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
+- `track_scripts/setup-scylladb` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
 - After editing any `lab.md`, run `./build-instruqt.sh`, then `instruqt track push`.
 
 ## Gemini usage

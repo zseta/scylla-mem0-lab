@@ -8,17 +8,17 @@ tabs:
 - id: b7ledbdcrp9t
   title: Terminal
   type: terminal
-  hostname: workstation
+  hostname: scylladb
   workdir: /root/mem0-lab/lab
 - id: m5wmeupaooic
   title: Terminal 2
   type: terminal
-  hostname: workstation
+  hostname: scylladb
   workdir: /root/mem0-lab/lab
 - id: v9xxznibfxbj
   title: App
   type: service
-  hostname: workstation
+  hostname: scylladb
   port: 8501
 difficulty: basic
 timelimit: 7200
