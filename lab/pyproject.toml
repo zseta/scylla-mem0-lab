@@ -1,0 +1,28 @@
+[project]
+name = "mem0-scylladb-lab"
+version = "0.1.0"
+description = "Workshop: agent memory with mem0 and ScyllaDB"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    # mem0 with the ScyllaDB vector store (PR mem0ai/mem0#5373), pinned to a commit.
+    "mem0ai[scylladb,nlp] @ git+https://github.com/zseta/mem0.git@5ffebb17547a4491b55735284e012c802558471f",
+    "google-genai>=2.33.0",
+    "sentence-transformers>=6.2.0",
+    "torch>=2.14.1",
+    "streamlit>=1.66.1",
+    "python-dotenv>=1.1.0",
+    # spaCy model mem0 uses for entity extraction; pinned here so it is not downloaded at runtime
+    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+]
+
+[tool.uv]
+package = false
+
+# CPU-only torch: the CUDA build is several GB and the lab VM has no GPU.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

@@ -1,0 +1,6 @@
+version: "3"
+virtualmachines:
+- name: workstation
+  image: scylladb/vector-2026-3-4
+  shell: /bin/bash
+  machine_type: n1-standard-4

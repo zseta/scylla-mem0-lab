@@ -1,0 +1,21 @@
+---
+slug: workshop
+type: challenge
+title: Agent memory with mem0 and ScyllaDB
+teaser: From a bot with no memory to a highly available memory layer, in 11 exercises.
+tabs:
+- title: Terminal
+  type: terminal
+  hostname: workstation
+  workdir: /root/mem0-lab/lab
+- title: Terminal 2
+  type: terminal
+  hostname: workstation
+  workdir: /root/mem0-lab/lab
+- title: App
+  type: service
+  hostname: workstation
+  port: 8501
+difficulty: basic
+timelimit: 7200
+---

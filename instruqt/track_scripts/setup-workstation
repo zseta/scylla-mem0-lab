@@ -1,0 +1,17 @@
+#!/bin/bash
+# Runs once when the sandbox starts, before the learner sees it.
+# Clones the lab and pre-installs everything (see lab/setup.sh).
+set -euxo pipefail
+
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]; do
+  echo "Waiting for Instruqt bootstrap to complete"
+  sleep 1
+done
+
+REPO_URL="${REPO_URL:-https://github.com/zseta/scylla-mem0-lab.git}"
+REPO_REF="${REPO_REF:-main}"
+
+if [ ! -d /root/mem0-lab ]; then
+  git clone --depth 1 --branch "$REPO_REF" "$REPO_URL" /root/mem0-lab
+fi
+/root/mem0-lab/lab/setup.sh

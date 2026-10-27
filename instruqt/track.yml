@@ -1,0 +1,28 @@
+slug: mem0-scylladb-agent-memory
+type: track
+title: Agent Memory with mem0 and ScyllaDB
+teaser: Give an AI support bot a memory with mem0, stored in a 3-node ScyllaDB cluster.
+description: |-
+  Start with a support bot that forgets everything between tickets. Add mem0 step by step:
+  add and search memories, scope them by customer, bot and ticket, update and delete them,
+  tag them with metadata, control what gets remembered, then measure performance and stop
+  a ScyllaDB node to see high availability. Every step shows the CQL mem0 runs on ScyllaDB.
+icon: https://cdn.instruqt.com/assets/templates/ubuntu.png
+tags:
+- mem0
+- scylladb
+- ai-agents
+- vector-search
+owner: scylladb
+developers:
+- attila.toth@scylladb.com
+show_timer: true
+skipping_enabled: true
+idle_timeout: 1800
+timelimit: 7200
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  loadingMessages: true
+  default_layout: AssignmentLeft
+  default_layout_sidebar_size: 33

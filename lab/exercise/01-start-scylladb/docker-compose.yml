@@ -1,0 +1,49 @@
+# 3-node ScyllaDB cluster + Vector Store (indexing service for vector search).
+# Each node is in its own rack, like 3 availability zones: with replication factor 3,
+# every rack holds one copy of every row.
+# Small resources on purpose: runs on a laptop or a small lab VM.
+name: mem0-lab
+
+x-scylla: &scylla
+  image: scylladb/scylla:2026.3.4
+  networks: [lab]
+  healthcheck:
+    test: ["CMD-SHELL", "cqlsh -e 'SELECT now() FROM system.local'"]
+    interval: 5s
+    timeout: 10s
+    retries: 60
+
+services:
+  scylla-1:
+    <<: *scylla
+    container_name: scylla-1
+    command: --seeds scylla-1 --endpoint-snitch GossipingPropertyFileSnitch --dc datacenter1 --rack rack1 --smp 1 --memory 1G --overprovisioned 1 --max-networking-io-control-blocks 1000 --vector-store-primary-uri http://vector-store:6080
+    ports: ["9042:9042"]
+
+  scylla-2:
+    <<: *scylla
+    container_name: scylla-2
+    command: --seeds scylla-1 --endpoint-snitch GossipingPropertyFileSnitch --dc datacenter1 --rack rack2 --smp 1 --memory 1G --overprovisioned 1 --max-networking-io-control-blocks 1000 --vector-store-primary-uri http://vector-store:6080
+    depends_on:
+      scylla-1: {condition: service_healthy}
+
+  scylla-3:
+    <<: *scylla
+    container_name: scylla-3
+    command: --seeds scylla-1 --endpoint-snitch GossipingPropertyFileSnitch --dc datacenter1 --rack rack3 --smp 1 --memory 1G --overprovisioned 1 --max-networking-io-control-blocks 1000 --vector-store-primary-uri http://vector-store:6080
+    depends_on:
+      scylla-2: {condition: service_healthy}
+
+  vector-store:
+    image: scylladb/vector-store:1.14.0
+    container_name: lab-vector-store
+    environment:
+      VECTOR_STORE_URI: "0.0.0.0:6080"
+      VECTOR_STORE_SCYLLADB_URI: "scylla-1:9042"
+    ports: ["6080:6080"]
+    networks: [lab]
+    depends_on:
+      scylla-3: {condition: service_healthy}
+
+networks:
+  lab: {}
