@@ -14,7 +14,7 @@ A memory turn has three costs:
 
 1. **Terminal**: start this exercise's bot. `add()` now runs in a background thread.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/09-performance && ./run.sh
    ```
 
@@ -22,8 +22,8 @@ A memory turn has three costs:
    The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. The scenario waits 6 seconds before the second question.
 3. **Terminal**: load 1,000 memories for 200 customers, then benchmark search with 8 threads. This makes **no** Gemini calls (`add(infer=False)`).
 
-   ```bash
-   ./load.sh 200 8 10
+   ```run,sh
+   ~/mem0-lab/lab/exercise/09-performance/load.sh 200 8 10
    ```
 
 4. Compare the two lines of the result. On a laptop we measured:

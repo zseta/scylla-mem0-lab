@@ -19,7 +19,7 @@ memory.search(text, filters={"user_id": customer})
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/05-scoping && ./run.sh
    ```
 
@@ -30,7 +30,7 @@ memory.search(text, filters={"user_id": customer})
 3. **App**: in the sidebar, try each scope and ask: *Which address will you ship my order to?*
 4. **Terminal**: the leaked answer was stored as Alice's memory. Find it:
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep -i oslo
    ```
 

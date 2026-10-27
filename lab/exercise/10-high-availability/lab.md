@@ -11,19 +11,19 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 
 1. **Terminal**: start this exercise's bot. The sidebar shows each node's status.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/10-high-availability && ./run.sh
    ```
 
 2. **Terminal**: start the health check. Every second it writes a memory and reads it back at QUORUM. Leave it running.
 
-   ```bash
-   ./ha_check.sh
+   ```run,sh
+   ~/mem0-lab/lab/exercise/10-high-availability/ha_check.sh
    ```
 
 3. **Terminal 2**: stop one node.
 
-   ```bash
+   ```run,sh
    docker stop scylla-3
    docker exec scylla-1 nodetool status
    ```
@@ -32,7 +32,7 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 5. **App**: reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
 6. **Terminal**: bring the node back. It rejoins and catches up on the writes it missed.
 
-   ```bash
+   ```run,sh
    docker start scylla-3
    ```
 

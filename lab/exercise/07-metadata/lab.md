@@ -15,7 +15,7 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/07-metadata && ./run.sh
    ```
 
@@ -26,7 +26,7 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
 3. **App**: turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
 4. **Terminal**: see where the metadata lives.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep category
    ```
 

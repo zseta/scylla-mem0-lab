@@ -13,7 +13,7 @@ This is the standard memory loop: **search → prompt → LLM → add**.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/04-search-memories && ./run.sh
    ```
 

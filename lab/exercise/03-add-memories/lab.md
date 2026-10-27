@@ -22,7 +22,7 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/03-add-memories && ./run.sh
    ```
 
@@ -31,7 +31,7 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
 4. **App**: in the new ticket, the bot still forgets. It writes memories but does not read them yet.
 5. **Terminal**: look at Alice's memories in ScyllaDB.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT id, payload FROM memories WHERE user_id = 'alice';"
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories_entities WHERE user_id = 'alice';"
    ```

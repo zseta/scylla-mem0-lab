@@ -12,26 +12,23 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
 1. **Terminal**: start the cluster (about 1 minute).
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/01-start-scylladb && ./run.sh
    ```
 
 2. **Terminal**: check that all three nodes show `UN` (Up, Normal), each in a different rack.
 
-   ```bash
+   ```run,sh
    docker exec scylla-1 nodetool status
    ```
 
-3. **Terminal**: open a CQL shell and look around. Type `exit` to leave.
+3. **Terminal**: ask ScyllaDB which rack each node is in.
 
-   ```bash
-   ~/mem0-lab/lab/cqlsh.sh
+   ```run,sh
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT host_id, rack FROM system.local; SELECT peer, rack FROM system.peers;"
    ```
 
-   ```sql
-   SELECT host_id, rack FROM system.local;
-   SELECT peer, rack FROM system.peers;
-   ```
+   Want to explore further? `~/mem0-lab/lab/cqlsh.sh` opens an interactive CQL shell. Type `exit` to leave.
 
 ## What happened
 

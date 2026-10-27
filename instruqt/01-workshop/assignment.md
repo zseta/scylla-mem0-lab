@@ -54,7 +54,7 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
 
 1. **Terminal**: start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
    ```
 
@@ -86,26 +86,23 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
 1. **Terminal**: start the cluster (about 1 minute).
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/01-start-scylladb && ./run.sh
    ```
 
 2. **Terminal**: check that all three nodes show `UN` (Up, Normal), each in a different rack.
 
-   ```bash
+   ```run,sh
    docker exec scylla-1 nodetool status
    ```
 
-3. **Terminal**: open a CQL shell and look around. Type `exit` to leave.
+3. **Terminal**: ask ScyllaDB which rack each node is in.
 
-   ```bash
-   ~/mem0-lab/lab/cqlsh.sh
+   ```run,sh
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT host_id, rack FROM system.local; SELECT peer, rack FROM system.peers;"
    ```
 
-   ```sql
-   SELECT host_id, rack FROM system.local;
-   SELECT peer, rack FROM system.peers;
-   ```
+   Want to explore further? `~/mem0-lab/lab/cqlsh.sh` opens an interactive CQL shell. Type `exit` to leave.
 
 ### What happened
 
@@ -133,13 +130,13 @@ mem0, with its ScyllaDB provider, is already installed in this lab.
 
 1. **Terminal**: create the keyspace, connect mem0, and print every CQL statement it runs.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/02-connect-mem0 && ./run.sh
    ```
 
 2. **Terminal**: inspect the schema mem0 created.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "DESCRIBE TABLE plushie_shop.memories"
    ```
 
@@ -206,7 +203,7 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/03-add-memories && ./run.sh
    ```
 
@@ -215,7 +212,7 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
 4. **App**: in the new ticket, the bot still forgets. It writes memories but does not read them yet.
 5. **Terminal**: look at Alice's memories in ScyllaDB.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT id, payload FROM memories WHERE user_id = 'alice';"
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories_entities WHERE user_id = 'alice';"
    ```
@@ -249,7 +246,7 @@ This is the standard memory loop: **search → prompt → LLM → add**.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/04-search-memories && ./run.sh
    ```
 
@@ -299,7 +296,7 @@ memory.search(text, filters={"user_id": customer})
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/05-scoping && ./run.sh
    ```
 
@@ -310,7 +307,7 @@ memory.search(text, filters={"user_id": customer})
 3. **App**: in the sidebar, try each scope and ask: *Which address will you ship my order to?*
 4. **Terminal**: the leaked answer was stored as Alice's memory. Find it:
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep -i oslo
    ```
 
@@ -354,7 +351,7 @@ This exercise adds a **Rep dashboard** tab for a human support rep.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/06-memory-lifecycle && ./run.sh
    ```
 
@@ -405,7 +402,7 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/07-metadata && ./run.sh
    ```
 
@@ -416,7 +413,7 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
 3. **App**: turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
 4. **Terminal**: see where the metadata lives.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep category
    ```
 
@@ -456,7 +453,7 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/08-custom-instructions && ./run.sh
    ```
 
@@ -466,7 +463,7 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 3. **App**: read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
 4. **Terminal**: check what ScyllaDB holds for Bob.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'bob';"
    ```
 
@@ -496,7 +493,7 @@ A memory turn has three costs:
 
 1. **Terminal**: start this exercise's bot. `add()` now runs in a background thread.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/09-performance && ./run.sh
    ```
 
@@ -504,8 +501,8 @@ A memory turn has three costs:
    The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. The scenario waits 6 seconds before the second question.
 3. **Terminal**: load 1,000 memories for 200 customers, then benchmark search with 8 threads. This makes **no** Gemini calls (`add(infer=False)`).
 
-   ```bash
-   ./load.sh 200 8 10
+   ```run,sh
+   ~/mem0-lab/lab/exercise/09-performance/load.sh 200 8 10
    ```
 
 4. Compare the two lines of the result. On a laptop we measured:
@@ -548,19 +545,19 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 
 1. **Terminal**: start this exercise's bot. The sidebar shows each node's status.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/10-high-availability && ./run.sh
    ```
 
 2. **Terminal**: start the health check. Every second it writes a memory and reads it back at QUORUM. Leave it running.
 
-   ```bash
-   ./ha_check.sh
+   ```run,sh
+   ~/mem0-lab/lab/exercise/10-high-availability/ha_check.sh
    ```
 
 3. **Terminal 2**: stop one node.
 
-   ```bash
+   ```run,sh
    docker stop scylla-3
    docker exec scylla-1 nodetool status
    ```
@@ -569,7 +566,7 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 5. **App**: reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
 6. **Terminal**: bring the node back. It rejoins and catches up on the writes it missed.
 
-   ```bash
+   ```run,sh
    docker start scylla-3
    ```
 

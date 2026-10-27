@@ -8,7 +8,7 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
 
 1. **Terminal**: start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
    ```
 

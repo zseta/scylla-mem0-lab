@@ -14,13 +14,13 @@ mem0, with its ScyllaDB provider, is already installed in this lab.
 
 1. **Terminal**: create the keyspace, connect mem0, and print every CQL statement it runs.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/02-connect-mem0 && ./run.sh
    ```
 
 2. **Terminal**: inspect the schema mem0 created.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "DESCRIBE TABLE plushie_shop.memories"
    ```
 

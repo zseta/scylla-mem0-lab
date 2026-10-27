@@ -18,7 +18,7 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/08-custom-instructions && ./run.sh
    ```
 
@@ -28,7 +28,7 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 3. **App**: read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
 4. **Terminal**: check what ScyllaDB holds for Bob.
 
-   ```bash
+   ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'bob';"
    ```
 

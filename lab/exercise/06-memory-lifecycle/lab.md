@@ -16,7 +16,7 @@ This exercise adds a **Rep dashboard** tab for a human support rep.
 
 1. **Terminal**: start this exercise's bot.
 
-   ```bash
+   ```run,sh
    cd ~/mem0-lab/lab/exercise/06-memory-lifecycle && ./run.sh
    ```
 
