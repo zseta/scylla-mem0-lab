@@ -76,18 +76,18 @@ def dashboard(ctx):
         for r in sorted(rows, key=lambda r: r.get("created_at") or ""):
             mid = r["id"]
             with st.container(border=True):
-                c1, c2, c3, c4 = st.columns([8, 2, 2, 2], vertical_alignment="center")
-                c1.markdown(r["memory"])
-                c1.caption(f'id {mid[:8]} · bot {r.get("agent_id") or "-"} · ticket {r.get("run_id") or "-"} · '
+                st.markdown(r["memory"])
+                st.caption(f'id {mid[:8]} · bot {r.get("agent_id") or "-"} · ticket {r.get("run_id") or "-"} · '
                            f'created {(r.get("created_at") or "")[:16]}')
-                with c2.popover("Edit"):
-                    text = st.text_area("Memory", r["memory"], key=f"edit-{mid}")
-                    if st.button("Save", key=f"save-{mid}", type="primary"):
-                        run_action("mem0.update", lambda: memory.update(mid, text=text)["message"])
-                if c3.button("History", key=f"hist-{mid}"):
-                    run_action("mem0.history", lambda: show_history(mid))
-                if c4.button("Delete", key=f"del-{mid}"):
-                    run_action("mem0.delete", lambda: memory.delete(mid)["message"])
+                with st.container(horizontal=True):
+                    with st.popover("Edit"):
+                        text = st.text_area("Memory", r["memory"], key=f"edit-{mid}")
+                        if st.button("Save", key=f"save-{mid}", type="primary"):
+                            run_action("mem0.update", lambda: memory.update(mid, text=text)["message"])
+                    if st.button("History", key=f"hist-{mid}"):
+                        run_action("mem0.history", lambda: show_history(mid))
+                    if st.button("Delete", key=f"del-{mid}"):
+                        run_action("mem0.delete", lambda: memory.delete(mid)["message"])
 
         st.divider()
         sure = st.checkbox(f"I really want to forget everything about {customer}")
