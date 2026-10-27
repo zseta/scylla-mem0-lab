@@ -20,7 +20,6 @@ tabs:
   type: service
   hostname: scylladb
   port: 8501
-difficulty: ""
 timelimit: 7200
 enhanced_loading: null
 ---
@@ -31,13 +30,13 @@ You start with a bot that forgets everything between tickets. In each exercise y
 
 **Tabs**
 
-- **Terminal**: run the commands. Use **Terminal 2** when one command keeps running.
-- **App**: the bot (Streamlit). Reload this tab after each `./run.sh`.
+- [**Terminal**](tab-0): run the commands. Use [**Terminal 2**](tab-1) when one command keeps running.
+- [**App**](tab-2): the bot (Streamlit). Reload this tab after each `./run.sh`.
 
 **Each exercise**
 
 1. `cd` into the exercise folder and run `./run.sh`.
-2. Open the **App** tab and click **▶ Play scenario**, or chat yourself.
+2. Open the [**App**](tab-2) tab and click **▶ Play scenario**, then **Next ▶** for each message. Or chat yourself.
 3. Read **Under the hood** on the right: each step of a turn, with its CQL and latency.
 
 You need a Gemini API key. Get one for free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Playing every scenario once uses about 45 Gemini calls (about 170k tokens). Each message you type adds 2 calls.
@@ -52,14 +51,14 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
 
 ### Do
 
-1. **Terminal**: start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
+1. [**Terminal**](tab-0): start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
    ```
 
-2. **App**: click **▶ Play scenario**. Alice reports a late order, then opens a new ticket and asks for news.
-3. **App**: read the reply in the new ticket. The bot asks for the order number again.
+2. [**App**](tab-2): click **▶ Play scenario**, then **Next ▶** for each message. The line above the chat shows who sends what next. Alice reports a late order, then opens a new ticket and asks for news.
+3. [**App**](tab-2): read the reply in the new ticket. The bot asks for the order number again.
 4. Optional: write your own messages. Click **New ticket** in the sidebar to start a fresh conversation.
 
 ### What happened
@@ -84,22 +83,16 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
 ### Do
 
-1. **Terminal**: start the cluster (about 1 minute).
+1. [**Terminal**](tab-0): start the cluster.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/01-start-scylladb && ./run.sh
    ```
 
-2. **Terminal**: check that all three nodes show `UN` (Up, Normal), each in a different rack.
+2. [**Terminal**](tab-0): check that all three nodes show `UN` (Up, Normal), each in a different rack.
 
    ```run,sh
    docker exec scylla-1 nodetool status
-   ```
-
-3. **Terminal**: ask ScyllaDB which rack each node is in.
-
-   ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT host_id, rack FROM system.local; SELECT peer, rack FROM system.peers;"
    ```
 
    Want to explore further? `~/mem0-lab/lab/cqlsh.sh` opens an interactive CQL shell. Type `exit` to leave.
@@ -128,13 +121,13 @@ mem0, with its ScyllaDB provider, is already installed in this lab.
 
 ### Do
 
-1. **Terminal**: create the keyspace, connect mem0, and print every CQL statement it runs.
+1. [**Terminal**](tab-0): create the keyspace, connect mem0, and print every CQL statement it runs.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/02-connect-mem0 && ./run.sh
    ```
 
-2. **Terminal**: inspect the schema mem0 created.
+2. [**Terminal**](tab-0): inspect the schema mem0 created.
 
    ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "DESCRIBE TABLE plushie_shop.memories"
@@ -159,9 +152,27 @@ CREATE TABLE plushie_shop.memories (
   user_id text, agent_id text, run_id text, -- who the memory belongs to
   payload text                            -- JSON: memory text, metadata, timestamps
 );
+
+CREATE TABLE plushie_shop.memories_entities (
+  id text PRIMARY KEY,
+  vector VECTOR<FLOAT, 384>,              -- the embedding of the entity text
+  user_id text, agent_id text, run_id text,
+  payload text                            -- JSON: entity text and type, linked_memory_ids
+);
 ```
 
-For each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
+| Column | Type | In `memories` | In `memories_entities` |
+|---|---|---|---|
+| `id` | `text`, primary key | memory id (UUID) | entity id (UUID) |
+| `vector` | `VECTOR<FLOAT, 384>` | embedding of the memory text | embedding of the entity text |
+| `user_id` | `text` | the customer | the customer |
+| `agent_id` | `text` | the bot | the bot |
+| `run_id` | `text` | the ticket | the ticket |
+| `payload` | `text` (JSON) | memory text, metadata, timestamps | entity text and type, `linked_memory_ids` |
+
+An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Alice`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
+
+On both tables, for each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
 
 ```sql
 -- vector index, scoped by user_id: ANN search only looks at one user's vectors
@@ -170,6 +181,17 @@ CREATE CUSTOM INDEX memories_user_id_ann ON plushie_shop.memories ((user_id), ve
 -- secondary index, for listing a user's memories
 CREATE INDEX memories_user_id_idx ON plushie_shop.memories (user_id);
 ```
+
+The 6 indexes on `memories`. `memories_entities` gets the same 6, named `memories_entities_*`.
+
+| Index | Kind | Columns | Used by |
+|---|---|---|---|
+| `memories_user_id_ann` | local vector index | `(user_id)`, `vector`, filters `agent_id`, `run_id` | `search()` for one customer |
+| `memories_agent_id_ann` | local vector index | `(agent_id)`, `vector`, filters `user_id`, `run_id` | `search()` for one bot |
+| `memories_run_id_ann` | local vector index | `(run_id)`, `vector`, filters `user_id`, `agent_id` | `search()` for one ticket |
+| `memories_user_id_idx` | secondary index | `user_id` | `get_all()` for one customer |
+| `memories_agent_id_idx` | secondary index | `agent_id` | `get_all()` for one bot |
+| `memories_run_id_idx` | secondary index | `run_id` | `get_all()` for one ticket |
 
 - `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Alice never ranks Bob's memories.
 - Indexes need a keyspace that is **RF-rack-valid**: the replication factor equals the number of racks. That is why the cluster has 3 racks.
@@ -201,16 +223,16 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/03-add-memories && ./run.sh
    ```
 
-2. **App**: reload the tab, then click **▶ Play scenario**.
-3. **App**: in **Under the hood**, open the `mem0.add` step. You see the stored facts and the `INSERT` statements.
-4. **App**: in the new ticket, the bot still forgets. It writes memories but does not read them yet.
-5. **Terminal**: look at Alice's memories in ScyllaDB.
+2. [**App**](tab-2): reload the tab, then click **▶ Play scenario**. Alice sends her first message.
+3. [**App**](tab-2): in **Under the hood**, read the `mem0.add` step: the facts mem0 extracted, then the CQL. The `SELECT ... ANN OF` on `memories` is the deduplication lookup, then one `INSERT` per new fact. The statements on `memories_entities` link the entities.
+4. [**App**](tab-2): click **Next ▶** twice. In the new ticket, the bot still forgets: it writes memories but does not read them yet. That last message has no new facts, so `mem0.add` runs only the lookup.
+5. [**Terminal**](tab-0): look at Alice's memories in ScyllaDB.
 
    ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT id, payload FROM memories WHERE user_id = 'alice';"
@@ -244,16 +266,16 @@ This is the standard memory loop: **search → prompt → LLM → add**.
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/04-search-memories && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**.
-3. **App**: in Alice's new ticket, the bot now remembers the order, the city and the email preference.
-4. **App**: Bob asks what he ordered. The bot knows nothing about Bob: search only looks at Bob's memories.
-5. **App**: in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
+2. [**App**](tab-2): reload, then click **▶ Play scenario**.
+3. [**App**](tab-2): in Alice's new ticket, the bot now remembers the order, the city and the email preference.
+4. [**App**](tab-2): Bob asks what he ordered. The bot knows nothing about Bob: search only looks at Bob's memories.
+5. [**App**](tab-2): in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
 
 ### Under the hood
 
@@ -268,7 +290,7 @@ LIMIT 5;
 - `ORDER BY vector ANN OF ?` is an approximate nearest neighbor search: the Vector Store returns the closest vectors, and ScyllaDB returns the rows.
 - `WHERE user_id = ?` uses the local vector index for that user, so the search covers only this customer's memories. It stays fast however many customers you have.
 - `search()` time = embedding the question on CPU + this one query. The query itself takes a few milliseconds.
-- A new memory becomes searchable about a second after `add()`: the Vector Store follows table changes through CDC. The scenario pauses between steps for this.
+- A new memory becomes searchable about a second after `add()`: the Vector Store follows table changes through CDC. If you click **Next ▶** quickly, the scenario waits a moment for this.
 - mem0 v3 can also rank by keywords (BM25). The ScyllaDB provider does not support that yet: search here is semantic only. ScyllaDB will cover mem0's hybrid search needs in the future.
 
 **Takeaway:** the bot remembers across tickets, and each customer only sees their own memories.
@@ -294,18 +316,18 @@ memory.search(text, filters={"user_id": customer})
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/05-scoping && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**:
+2. [**App**](tab-2): reload, then click **▶ Play scenario**:
    - Bob gives the shipping bot his office address in Oslo.
    - Alice asks the shipping bot for her address, with scope **Bot only · agent_id**. The bot answers with **Bob's** address.
    - Alice asks again, with scope **Customer · user_id**. Now look at what she gets back.
-3. **App**: in the sidebar, try each scope and ask: *Which address will you ship my order to?*
-4. **Terminal**: the leaked answer was stored as Alice's memory. Find it:
+3. [**App**](tab-2): in the sidebar, try each scope and ask: *Which address will you ship my order to?*
+4. [**Terminal**](tab-0): the leaked answer was stored as Alice's memory. Find it:
 
    ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep -i oslo
@@ -349,17 +371,17 @@ This exercise adds a **Rep dashboard** tab for a human support rep.
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/06-memory-lifecycle && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**. Alice moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
-3. **App**: open **Rep dashboard** (customer `alice`):
+2. [**App**](tab-2): reload, then click **▶ Play scenario**. Alice moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
+3. [**App**](tab-2): open **Rep dashboard** (customer `alice`):
    - **Delete** the memories about Berlin and the Oslo office, and the leaked "User's name is Bob".
    - **Edit** one memory, then click **History** on it.
-4. **App**: back in **Chat**, open a **New ticket** and ask *Which address will you ship my next order to?*
+4. [**App**](tab-2): back in **Chat**, open a **New ticket** and ask *Which address will you ship my next order to?*
 5. Optional: select `bob`, tick the checkbox, and click **Forget bob · delete_all()**.
 
 ### Under the hood
@@ -400,18 +422,18 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/07-metadata && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**:
+2. [**App**](tab-2): reload, then click **▶ Play scenario**:
    - a **billing** ticket: Alice was charged twice,
    - a **product** ticket: is the plushie washable,
    - a **billing** ticket with **Search only this category** on: only billing memories come back.
-3. **App**: turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
-4. **Terminal**: see where the metadata lives.
+3. [**App**](tab-2): turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
+4. [**Terminal**](tab-0): see where the metadata lives.
 
    ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep category
@@ -451,17 +473,17 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 
 ### Do
 
-1. **Terminal**: start this exercise's bot.
+1. [**Terminal**](tab-0): start this exercise's bot.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/08-custom-instructions && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**. Bob sends the same message twice: card number, phone number, wool allergy.
+2. [**App**](tab-2): reload, then click **▶ Play scenario**. Bob sends the same message twice: card number, phone number, wool allergy.
    - **Privacy instructions OFF**: open the `mem0.add` step. The phone number and the allergy are stored.
    - **Privacy instructions ON**: only the order is stored.
-3. **App**: read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
-4. **Terminal**: check what ScyllaDB holds for Bob.
+3. [**App**](tab-2): read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
+4. [**Terminal**](tab-0): check what ScyllaDB holds for Bob.
 
    ```run,sh
    ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'bob';"
@@ -491,15 +513,15 @@ A memory turn has three costs:
 
 ### Do
 
-1. **Terminal**: start this exercise's bot. `add()` now runs in a background thread.
+1. [**Terminal**](tab-0): start this exercise's bot. `add()` now runs in a background thread.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/09-performance && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**. `mem0.add` takes about 0 ms: the reply no longer waits for it.
-   The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. The scenario waits 6 seconds before the second question.
-3. **Terminal**: load 1,000 memories for 200 customers, then benchmark search with 8 threads. This makes **no** Gemini calls (`add(infer=False)`).
+2. [**App**](tab-2): reload, then click **▶ Play scenario**. `mem0.add` takes about 0 ms: the reply no longer waits for it.
+   The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. If you click **Next ▶** sooner, the scenario waits until 6 seconds have passed before it sends the second question.
+3. [**Terminal**](tab-0): load 1,000 memories for 200 customers, then benchmark search with 8 threads. This makes **no** Gemini calls (`add(infer=False)`).
 
    ```run,sh
    ~/mem0-lab/lab/exercise/09-performance/load.sh 200 8 10
@@ -543,19 +565,19 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 
 ### Do
 
-1. **Terminal**: start this exercise's bot. The sidebar shows each node's status.
+1. [**Terminal**](tab-0): start this exercise's bot. The sidebar shows each node's status.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/10-high-availability && ./run.sh
    ```
 
-2. **Terminal**: start the health check. Every second it writes a memory and reads it back at QUORUM. Leave it running.
+2. [**Terminal**](tab-0): start the health check. Every second it writes a memory and reads it back at QUORUM. Leave it running.
 
    ```run,sh
    ~/mem0-lab/lab/exercise/10-high-availability/ha_check.sh
    ```
 
-3. **Terminal 2**: stop one node.
+3. [**Terminal 2**](tab-1): stop one node.
 
    ```run,sh
    docker stop scylla-3
@@ -563,8 +585,8 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
    ```
 
 4. Watch the health check: `nodes up: 2/3`, and every line still says `OK`.
-5. **App**: reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
-6. **Terminal**: bring the node back. It rejoins and catches up on the writes it missed.
+5. [**App**](tab-2): reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
+6. [**Terminal**](tab-0): bring the node back. It rejoins and catches up on the writes it missed.
 
    ```run,sh
    docker start scylla-3

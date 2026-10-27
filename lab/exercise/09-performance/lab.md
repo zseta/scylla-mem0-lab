@@ -19,7 +19,7 @@ A memory turn has three costs:
    ```
 
 2. **App**: reload, then click **▶ Play scenario**. `mem0.add` takes about 0 ms: the reply no longer waits for it.
-   The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. The scenario waits 6 seconds before the second question.
+   The trade-off: a memory is searchable only after the background `add()` finishes and the index catches up, a few seconds later. If you click **Next ▶** sooner, the scenario waits until 6 seconds have passed before it sends the second question.
 3. **Terminal**: load 1,000 memories for 200 customers, then benchmark search with 8 threads. This makes **no** Gemini calls (`add(infer=False)`).
 
    ```run,sh

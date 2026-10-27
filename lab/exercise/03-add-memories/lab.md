@@ -26,9 +26,9 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
    cd ~/mem0-lab/lab/exercise/03-add-memories && ./run.sh
    ```
 
-2. **App**: reload the tab, then click **▶ Play scenario**.
-3. **App**: in **Under the hood**, open the `mem0.add` step. You see the stored facts and the `INSERT` statements.
-4. **App**: in the new ticket, the bot still forgets. It writes memories but does not read them yet.
+2. **App**: reload the tab, then click **▶ Play scenario**. Alice sends her first message.
+3. **App**: in **Under the hood**, read the `mem0.add` step: the facts mem0 extracted, then the CQL. The `SELECT ... ANN OF` on `memories` is the deduplication lookup, then one `INSERT` per new fact. The statements on `memories_entities` link the entities.
+4. **App**: click **Next ▶** twice. In the new ticket, the bot still forgets: it writes memories but does not read them yet. That last message has no new facts, so `mem0.add` runs only the lookup.
 5. **Terminal**: look at Alice's memories in ScyllaDB.
 
    ```run,sh

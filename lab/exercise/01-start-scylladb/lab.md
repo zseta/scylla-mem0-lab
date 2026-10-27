@@ -10,7 +10,7 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
 ## Do
 
-1. **Terminal**: start the cluster (about 1 minute).
+1. **Terminal**: start the cluster.
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/01-start-scylladb && ./run.sh
@@ -20,12 +20,6 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
    ```run,sh
    docker exec scylla-1 nodetool status
-   ```
-
-3. **Terminal**: ask ScyllaDB which rack each node is in.
-
-   ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT host_id, rack FROM system.local; SELECT peer, rack FROM system.peers;"
    ```
 
    Want to explore further? `~/mem0-lab/lab/cqlsh.sh` opens an interactive CQL shell. Type `exit` to leave.

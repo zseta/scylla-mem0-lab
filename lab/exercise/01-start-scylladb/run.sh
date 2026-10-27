@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "Starting scylla-1, scylla-2, scylla-3 and the Vector Store (about 1 minute)..."
+echo "Starting scylla-1, scylla-2, scylla-3 and the Vector Store..."
 docker compose up -d --wait
 
 echo

@@ -35,7 +35,7 @@ LIMIT 5;
 - `ORDER BY vector ANN OF ?` is an approximate nearest neighbor search: the Vector Store returns the closest vectors, and ScyllaDB returns the rows.
 - `WHERE user_id = ?` uses the local vector index for that user, so the search covers only this customer's memories. It stays fast however many customers you have.
 - `search()` time = embedding the question on CPU + this one query. The query itself takes a few milliseconds.
-- A new memory becomes searchable about a second after `add()`: the Vector Store follows table changes through CDC. The scenario pauses between steps for this.
+- A new memory becomes searchable about a second after `add()`: the Vector Store follows table changes through CDC. If you click **Next ▶** quickly, the scenario waits a moment for this.
 - mem0 v3 can also rank by keywords (BM25). The ScyllaDB provider does not support that yet: search here is semantic only. ScyllaDB will cover mem0's hybrid search needs in the future.
 
 **Takeaway:** the bot remembers across tickets, and each customer only sees their own memories.

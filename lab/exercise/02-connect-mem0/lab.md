@@ -43,9 +43,27 @@ CREATE TABLE plushie_shop.memories (
   user_id text, agent_id text, run_id text, -- who the memory belongs to
   payload text                            -- JSON: memory text, metadata, timestamps
 );
+
+CREATE TABLE plushie_shop.memories_entities (
+  id text PRIMARY KEY,
+  vector VECTOR<FLOAT, 384>,              -- the embedding of the entity text
+  user_id text, agent_id text, run_id text,
+  payload text                            -- JSON: entity text and type, linked_memory_ids
+);
 ```
 
-For each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
+| Column | Type | In `memories` | In `memories_entities` |
+|---|---|---|---|
+| `id` | `text`, primary key | memory id (UUID) | entity id (UUID) |
+| `vector` | `VECTOR<FLOAT, 384>` | embedding of the memory text | embedding of the entity text |
+| `user_id` | `text` | the customer | the customer |
+| `agent_id` | `text` | the bot | the bot |
+| `run_id` | `text` | the ticket | the ticket |
+| `payload` | `text` (JSON) | memory text, metadata, timestamps | entity text and type, `linked_memory_ids` |
+
+An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Alice`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
+
+On both tables, for each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
 
 ```sql
 -- vector index, scoped by user_id: ANN search only looks at one user's vectors
@@ -54,6 +72,17 @@ CREATE CUSTOM INDEX memories_user_id_ann ON plushie_shop.memories ((user_id), ve
 -- secondary index, for listing a user's memories
 CREATE INDEX memories_user_id_idx ON plushie_shop.memories (user_id);
 ```
+
+The 6 indexes on `memories`. `memories_entities` gets the same 6, named `memories_entities_*`.
+
+| Index | Kind | Columns | Used by |
+|---|---|---|---|
+| `memories_user_id_ann` | local vector index | `(user_id)`, `vector`, filters `agent_id`, `run_id` | `search()` for one customer |
+| `memories_agent_id_ann` | local vector index | `(agent_id)`, `vector`, filters `user_id`, `run_id` | `search()` for one bot |
+| `memories_run_id_ann` | local vector index | `(run_id)`, `vector`, filters `user_id`, `agent_id` | `search()` for one ticket |
+| `memories_user_id_idx` | secondary index | `user_id` | `get_all()` for one customer |
+| `memories_agent_id_idx` | secondary index | `agent_id` | `get_all()` for one bot |
+| `memories_run_id_idx` | secondary index | `run_id` | `get_all()` for one ticket |
 
 - `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Alice never ranks Bob's memories.
 - Indexes need a keyspace that is **RF-rack-valid**: the replication factor equals the number of racks. That is why the cluster has 3 racks.

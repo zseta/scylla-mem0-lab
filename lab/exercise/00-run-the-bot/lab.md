@@ -12,7 +12,7 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
    ```
 
-2. **App**: click **▶ Play scenario**. Alice reports a late order, then opens a new ticket and asks for news.
+2. **App**: click **▶ Play scenario**, then **Next ▶** for each message. The line above the chat shows who sends what next. Alice reports a late order, then opens a new ticket and asks for news.
 3. **App**: read the reply in the new ticket. The bot asks for the order number again.
 4. Optional: write your own messages. Click **New ticket** in the sidebar to start a fresh conversation.
 
