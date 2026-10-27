@@ -1,23 +1,28 @@
 ---
 slug: workshop
+id: nn9yqtiktt8y
 type: challenge
 title: Agent memory with mem0 and ScyllaDB
 teaser: From a bot with no memory to a highly available memory layer, in 11 exercises.
 tabs:
-- title: Terminal
+- id: b7ledbdcrp9t
+  title: Terminal
   type: terminal
   hostname: workstation
   workdir: /root/mem0-lab/lab
-- title: Terminal 2
+- id: m5wmeupaooic
+  title: Terminal 2
   type: terminal
   hostname: workstation
   workdir: /root/mem0-lab/lab
-- title: App
+- id: v9xxznibfxbj
+  title: App
   type: service
   hostname: workstation
   port: 8501
 difficulty: basic
 timelimit: 7200
+enhanced_loading: null
 ---
 
 Welcome! In this lab you give an AI support bot a memory with **mem0**, stored in **ScyllaDB**.

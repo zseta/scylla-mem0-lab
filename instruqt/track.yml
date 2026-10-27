@@ -9,10 +9,10 @@ description: |-
   a ScyllaDB node to see high availability. Every step shows the CQL mem0 runs on ScyllaDB.
 icon: https://cdn.instruqt.com/assets/templates/ubuntu.png
 tags:
-- mem0
 - scylladb
-- ai-agents
+- mem0
 - vector-search
+- ai-agents
 owner: scylladb
 developers:
 - attila.toth@scylladb.com
@@ -23,8 +23,10 @@ timelimit: 7200
 lab_config:
   sidebar_enabled: true
   feedback_recap_enabled: true
+  feedback_tab_enabled: false
   loadingMessages: true
+  hideStopButton: false
   default_layout: AssignmentLeft
   default_layout_sidebar_size: 33
-checksum: "7060799759256032873"
+checksum: "2388071838911572847"
 enhanced_loading: false

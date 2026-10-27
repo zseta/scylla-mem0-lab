@@ -11,15 +11,9 @@ demote() {
   awk '/^```/ { fence = !fence } !fence && /^#/ { print "#" $0; next } { print }' "$1"
 }
 
-# Instruqt adds an "id:" to assignment.md on the first push. Keep it across rebuilds.
-ID_LINE="$(grep -m1 '^id: ' "$OUT" 2>/dev/null || true)"
-
+# frontmatter.yml holds the ids Instruqt assigned on the first push. Keep them.
 {
-  if [ -n "$ID_LINE" ]; then
-    sed "2i $ID_LINE" "$CHALLENGE/frontmatter.yml"
-  else
-    cat "$CHALLENGE/frontmatter.yml"
-  fi
+  cat "$CHALLENGE/frontmatter.yml"
   echo
   cat "$LAB_DIR/intro.md"
   for f in "$LAB_DIR"/exercise/*/lab.md; do
