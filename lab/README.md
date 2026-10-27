@@ -65,4 +65,4 @@ Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 
 ## Gemini usage
 
-Each chat turn is 2 Gemini calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 25 turns. Exercises 09 and 10 load and check data with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.
+Each chat turn is 2 Gemini calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 45 calls and 170k tokens (measured). Exercises 09 and 10 load and check data with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.
