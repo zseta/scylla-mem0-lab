@@ -1,5 +1,5 @@
 slug: mem0-scylladb-agent-memory
-type: track
+id: aievrfyotelb
 title: Agent Memory with mem0 and ScyllaDB
 teaser: Give an AI support bot a memory with mem0, stored in a 3-node ScyllaDB cluster.
 description: |-
@@ -26,3 +26,5 @@ lab_config:
   loadingMessages: true
   default_layout: AssignmentLeft
   default_layout_sidebar_size: 33
+checksum: "7060799759256032873"
+enhanced_loading: false
