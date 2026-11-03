@@ -28,9 +28,9 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
    docker exec scylla-1 nodetool status
    ```
 
-4. Watch the health check: `nodes up: 2/3`, and every line still says `OK`.
+4. **Terminal**: watch the health check: `nodes up: 2/3`, and every line still says `OK`.
 5. **App**: reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
-6. **Terminal**: bring the node back. It rejoins and catches up on the writes it missed.
+6. **Terminal 2**: bring the node back. It rejoins and catches up on the writes it missed.
 
    ```run,sh
    docker start scylla-3
