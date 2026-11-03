@@ -11,7 +11,7 @@ memory.search(text, filters={"user_id": customer, "category": "billing"})
 
 The bot sets `category` from the ticket category in the sidebar, and `order_id` when the message mentions `#1234`.
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

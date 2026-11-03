@@ -55,7 +55,7 @@ Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on G
 
 It has no memory. Each reply sees only the messages of the current ticket. When the customer opens a new ticket, the bot starts from zero. That is the problem this workshop solves.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
 
@@ -87,7 +87,7 @@ mem0 needs a place to keep memories. You start a 3-node ScyllaDB cluster plus th
 
 The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster fits on this lab VM.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start the cluster.
 
@@ -125,7 +125,7 @@ mem0 is a memory layer for AI agents. It has three parts, all set in one config:
 
 mem0, with its ScyllaDB provider, is already installed in this lab.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): create the keyspace, connect mem0, and print every CQL statement it runs.
 
@@ -227,7 +227,7 @@ What `add()` does:
 
 mem0 v3 only **adds**. It never silently overwrites an old fact.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -270,7 +270,7 @@ reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), hist
 
 This is the standard memory loop: **search → prompt → LLM → add**.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -320,7 +320,7 @@ memory.add(messages, user_id=customer, agent_id=bot, run_id=ticket)
 memory.search(text, filters={"user_id": customer})
 ```
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -375,7 +375,7 @@ mem0 v3 only adds memories. When a fact changes ("I moved to Lisbon"), the old f
 
 This exercise adds a **Rep dashboard** tab for a human support rep.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -426,7 +426,7 @@ memory.search(text, filters={"user_id": customer, "category": "billing"})
 
 The bot sets `category` from the ticket category in the sidebar, and `order_id` when the message mentions `#1234`.
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -477,7 +477,7 @@ or per call, as this bot does:
 memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 ```
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot.
 
@@ -517,7 +517,7 @@ A memory turn has three costs:
 | LLM reply | Gemini | yes |
 | `add()` | Gemini extraction + embed + writes | **no need** |
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot. `add()` now runs in a background thread.
 
@@ -569,7 +569,7 @@ from cassandra import ConsistencyLevel
 set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 ```
 
-### Do
+### Exercise
 
 1. [**Terminal**](tab-0): start this exercise's bot. The sidebar shows each node's status.
 

@@ -7,7 +7,7 @@ from cassandra import ConsistencyLevel
 set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 ```
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot. The sidebar shows each node's status.
 

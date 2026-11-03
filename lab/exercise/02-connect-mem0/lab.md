@@ -10,7 +10,7 @@ mem0 is a memory layer for AI agents. It has three parts, all set in one config:
 
 mem0, with its ScyllaDB provider, is already installed in this lab.
 
-## Do
+## Exercise
 
 1. **Terminal**: create the keyspace, connect mem0, and print every CQL statement it runs.
 

@@ -4,7 +4,7 @@ Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on G
 
 It has no memory. Each reply sees only the messages of the current ticket. When the customer opens a new ticket, the bot starts from zero. That is the problem this workshop solves.
 
-## Do
+## Exercise
 
 1. **Terminal**: start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
 

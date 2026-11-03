@@ -15,7 +15,7 @@ memory.add(messages, user_id=customer, agent_id=bot, run_id=ticket)
 memory.search(text, filters={"user_id": customer})
 ```
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

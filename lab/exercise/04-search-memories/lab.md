@@ -9,7 +9,7 @@ reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), hist
 
 This is the standard memory loop: **search → prompt → LLM → add**.
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

@@ -12,7 +12,7 @@ mem0 v3 only adds memories. When a fact changes ("I moved to Lisbon"), the old f
 
 This exercise adds a **Rep dashboard** tab for a human support rep.
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

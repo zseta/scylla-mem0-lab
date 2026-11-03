@@ -14,7 +14,7 @@ or per call, as this bot does:
 memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
 ```
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

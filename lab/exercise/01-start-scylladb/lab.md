@@ -8,7 +8,7 @@ mem0 needs a place to keep memories. You start a 3-node ScyllaDB cluster plus th
 
 The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster fits on this lab VM.
 
-## Do
+## Exercise
 
 1. **Terminal**: start the cluster.
 

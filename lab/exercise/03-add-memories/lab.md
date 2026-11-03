@@ -18,7 +18,7 @@ What `add()` does:
 
 mem0 v3 only **adds**. It never silently overwrites an old fact.
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot.
 

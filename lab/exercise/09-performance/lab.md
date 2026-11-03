@@ -10,7 +10,7 @@ A memory turn has three costs:
 | LLM reply | Gemini | yes |
 | `add()` | Gemini extraction + embed + writes | **no need** |
 
-## Do
+## Exercise
 
 1. **Terminal**: start this exercise's bot. `add()` now runs in a background thread.
 
