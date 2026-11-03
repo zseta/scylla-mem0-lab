@@ -10,11 +10,11 @@ from common import gemini, shop, ui
 from common.memory import create_memory
 
 SCENARIO = [
-    {"customer": "alice", "new_ticket": True,
-     "say": "Hi, I'm Alice. My order #4821, a large Scylla plushie, still hasn't arrived. I live in Berlin."},
+    {"customer": "nora", "new_ticket": True,
+     "say": "Hi, I'm Nora. My order #4821, a large Scylla plushie, still hasn't arrived. I live in Berlin."},
     {"say": "Please send updates by email, not phone. Thanks!"},
     {"new_ticket": True, "say": "Hi again! Any news about my order?"},
-    {"customer": "bob", "new_ticket": True, "say": "Hi! Do you remember what I ordered?"},
+    {"customer": "erik", "new_ticket": True, "say": "Hi! Do you remember what I ordered?"},
 ]
 
 

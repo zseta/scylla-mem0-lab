@@ -16,11 +16,11 @@ orders, products, shipping city and address, contact preferences, problems and t
 Never remember payment card numbers, expiry dates, CVV codes, passwords, phone numbers
 or health information. Leave them out completely, do not paraphrase them."""
 
-SENSITIVE = ("Hi, I'm Bob. Charge my card 4111 1111 1111 1111, expiry 12/28, for a Scylla Plushie Family. "
+SENSITIVE = ("Hi, I'm Erik. Charge my card 4111 1111 1111 1111, expiry 12/28, for a Scylla Plushie Family. "
              "Call me at +47 555 01234 when it ships. I'm allergic to wool, is the plushie wool-free?")
 
 SCENARIO = [
-    {"customer": "bob", "bot": "billing-bot", "privacy": False, "new_ticket": True, "say": SENSITIVE},
+    {"customer": "erik", "bot": "billing-bot", "privacy": False, "new_ticket": True, "say": SENSITIVE},
     {"privacy": True, "new_ticket": True, "say": SENSITIVE},
 ]
 

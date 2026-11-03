@@ -16,7 +16,7 @@ from common.memory import create_memory
 from common.turn import Turn
 
 SCENARIO = [
-    {"customer": "alice", "bot": "shipping-bot", "new_ticket": True,
+    {"customer": "nora", "bot": "shipping-bot", "new_ticket": True,
      "say": "Hi, I moved! My new address is Rua Augusta 10, Lisbon. Please use it from now on."},
     {"new_ticket": True, "say": "Hi! Which address will you ship my next order to?"},
 ]

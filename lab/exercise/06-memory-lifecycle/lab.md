@@ -20,12 +20,12 @@ This exercise adds a **Rep dashboard** tab for a human support rep.
    cd ~/mem0-lab/lab/exercise/06-memory-lifecycle && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**. Alice moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
-3. **App**: open **Rep dashboard** (customer `alice`):
-   - **Delete** the memories about Berlin and the Oslo office, and the leaked "User's name is Bob".
+2. **App**: reload, then click **▶ Play scenario**. Nora moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
+3. **App**: open **Rep dashboard** (customer `nora`):
+   - **Delete** the memories about Berlin and the Oslo office, and the leaked "User's name is Erik".
    - **Edit** one memory, then click **History** on it.
 4. **App**: back in **Chat**, open a **New ticket** and ask *Which address will you ship my next order to?*
-5. Optional: select `bob`, tick the checkbox, and click **Forget bob · delete_all()**.
+5. Optional: select `erik`, tick the checkbox, and click **Forget erik · delete_all()**.
 
 ## Under the hood
 

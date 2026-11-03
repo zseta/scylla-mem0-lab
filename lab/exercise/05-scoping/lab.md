@@ -4,7 +4,7 @@ Real support has many customers, several bots and many tickets. mem0 tags every 
 
 | ID | In this shop | Example |
 |---|---|---|
-| `user_id` | the customer | `alice` |
+| `user_id` | the customer | `nora` |
 | `agent_id` | the bot | `shipping-bot`, `billing-bot` |
 | `run_id` | the ticket | `T-1004` |
 
@@ -24,14 +24,14 @@ memory.search(text, filters={"user_id": customer})
    ```
 
 2. **App**: reload, then click **▶ Play scenario**:
-   - Bob gives the shipping bot his office address in Oslo.
-   - Alice asks the shipping bot for her address, with scope **Bot only · agent_id**. The bot answers with **Bob's** address.
-   - Alice asks again, with scope **Customer · user_id**. Now look at what she gets back.
+   - Erik gives the shipping bot his office address in Oslo.
+   - Nora asks the shipping bot for her address, with scope **Bot only · agent_id**. The bot answers with **Erik's** address.
+   - Nora asks again, with scope **Customer · user_id**. Now look at what she gets back.
 3. **App**: in the sidebar, try each scope and ask: *Which address will you ship my order to?*
-4. **Terminal**: the leaked answer was stored as Alice's memory. Find it:
+4. **Terminal**: the leaked answer was stored as Nora's memory. Find it:
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep -i oslo
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'nora';" | grep -i oslo
    ```
 
 ## Under the hood
@@ -49,7 +49,7 @@ SELECT ... WHERE user_id = ? AND agent_id = ? ORDER BY vector ANN OF ? LIMIT 5 A
 ```
 
 - Scoping by `agent_id` alone searches everything that bot ever heard, from every customer.
-- A wrong read becomes a wrong write: `add()` stored the leaked reply as a fact about Alice. Exercise 06 cleans it up.
+- A wrong read becomes a wrong write: `add()` stored the leaked reply as a fact about Nora. Exercise 06 cleans it up.
 - `search()` without any of the three IDs fails. mem0 and the ScyllaDB provider both require a scope.
 
 **Takeaway:** always scope by `user_id`. Narrow with `agent_id` or `run_id` when it makes sense.

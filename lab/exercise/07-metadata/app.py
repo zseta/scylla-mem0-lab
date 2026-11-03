@@ -14,7 +14,7 @@ from common.memory import create_memory
 CATEGORIES = ["shipping", "billing", "product"]
 
 SCENARIO = [
-    {"customer": "alice", "bot": "billing-bot", "category": "billing", "filter_on": False, "new_ticket": True,
+    {"customer": "nora", "bot": "billing-bot", "category": "billing", "filter_on": False, "new_ticket": True,
      "say": "I was charged twice for order #4821. Please refund one of the charges."},
     {"category": "product", "new_ticket": True,
      "say": "Is the large plushie machine washable? I want one for my nephew Leo."},

@@ -21,9 +21,9 @@ SCOPES = {
 }
 
 SCENARIO = [
-    {"customer": "bob", "bot": "shipping-bot", "scope": "Customer · user_id", "new_ticket": True,
-     "say": "Hi, I'm Bob. Please ship my small Scylla plushie to my office: 12 Harbour Street, Oslo."},
-    {"customer": "alice", "scope": "Bot only · agent_id  (wrong!)", "new_ticket": True,
+    {"customer": "erik", "bot": "shipping-bot", "scope": "Customer · user_id", "new_ticket": True,
+     "say": "Hi, I'm Erik. Please ship my small Scylla plushie to my office: 12 Harbour Street, Oslo."},
+    {"customer": "nora", "scope": "Bot only · agent_id  (wrong!)", "new_ticket": True,
      "say": "Hi! Which address will you ship my order to?"},
     {"scope": "Customer · user_id", "new_ticket": True,
      "say": "Hi! Which address will you ship my order to?"},

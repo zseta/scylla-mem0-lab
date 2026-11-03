@@ -61,7 +61,7 @@ CREATE TABLE plushie_shop.memories_entities (
 | `run_id` | `text` | the ticket | the ticket |
 | `payload` | `text` (JSON) | memory text, metadata, timestamps | entity text and type, `linked_memory_ids` |
 
-An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Alice`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
+An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Nora`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
 
 On both tables, for each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
 
@@ -84,7 +84,7 @@ The 6 indexes on `memories`. `memories_entities` gets the same 6, named `memorie
 | `memories_agent_id_idx` | secondary index | `agent_id` | `get_all()` for one bot |
 | `memories_run_id_idx` | secondary index | `run_id` | `get_all()` for one ticket |
 
-- `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Alice never ranks Bob's memories.
+- `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Nora never ranks Erik's memories.
 - Indexes need a keyspace that is **RF-rack-valid**: the replication factor equals the number of racks. That is why the cluster has 3 racks.
 - mem0 keeps the change history of each memory in a local SQLite file (`lab/.data/history.db`), not in ScyllaDB.
 

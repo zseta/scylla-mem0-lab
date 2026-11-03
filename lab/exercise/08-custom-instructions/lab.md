@@ -22,14 +22,14 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
    cd ~/mem0-lab/lab/exercise/08-custom-instructions && ./run.sh
    ```
 
-2. **App**: reload, then click **▶ Play scenario**. Bob sends the same message twice: card number, phone number, wool allergy.
+2. **App**: reload, then click **▶ Play scenario**. Erik sends the same message twice: card number, phone number, wool allergy.
    - **Privacy instructions OFF**: open the `mem0.add` step. The phone number and the allergy are stored.
    - **Privacy instructions ON**: only the order is stored.
 3. **App**: read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
-4. **Terminal**: check what ScyllaDB holds for Bob.
+4. **Terminal**: check what ScyllaDB holds for Erik.
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'bob';"
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'erik';"
    ```
 
 ## Under the hood

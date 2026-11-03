@@ -21,7 +21,7 @@ SCYLLA_HOST = os.getenv("SCYLLA_HOST", "127.0.0.1")
 SCYLLA_DC = os.getenv("SCYLLA_DC", "datacenter1")
 KEYSPACE = os.getenv("KEYSPACE", "plushie_shop")
 
-CUSTOMERS = ["alice", "bob"]
+CUSTOMERS = ["nora", "erik"]
 
 
 def google_api_key() -> str:

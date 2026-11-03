@@ -19,7 +19,7 @@ Never remember payment card numbers, expiry dates, CVV codes, passwords, phone n
 or health information. Leave them out completely, do not paraphrase them."""
 
 SCENARIO = [
-    {"customer": "alice", "bot": "shipping-bot", "new_ticket": True,
+    {"customer": "nora", "bot": "shipping-bot", "new_ticket": True,
      "say": "Hi! Can I add gift wrapping to my next order? It's a birthday present for Leo."},
     {"new_ticket": True, "wait": 6, "say": "Hi, quick question: who was the gift for again?"},
 ]

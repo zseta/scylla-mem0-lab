@@ -13,7 +13,7 @@ from common import gemini, shop, ui
 from common.memory import create_memory, set_consistency
 
 SCENARIO = [
-    {"customer": "alice", "bot": "shipping-bot", "new_ticket": True,
+    {"customer": "nora", "bot": "shipping-bot", "new_ticket": True,
      "say": "Hi! Please remind me: what's my latest shipping address?"},
     {"say": "Great. I'd also like a small plushie for my office desk."},
 ]

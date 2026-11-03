@@ -20,14 +20,14 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
    ```
 
 2. **App**: reload, then click **▶ Play scenario**:
-   - a **billing** ticket: Alice was charged twice,
+   - a **billing** ticket: Nora was charged twice,
    - a **product** ticket: is the plushie washable,
    - a **billing** ticket with **Search only this category** on: only billing memories come back.
 3. **App**: turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
 4. **Terminal**: see where the metadata lives.
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep category
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'nora';" | grep category
    ```
 
 ## Under the hood

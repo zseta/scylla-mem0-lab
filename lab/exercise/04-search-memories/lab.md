@@ -18,8 +18,8 @@ This is the standard memory loop: **search → prompt → LLM → add**.
    ```
 
 2. **App**: reload, then click **▶ Play scenario**.
-3. **App**: in Alice's new ticket, the bot now remembers the order, the city and the email preference.
-4. **App**: Bob asks what he ordered. The bot knows nothing about Bob: search only looks at Bob's memories.
+3. **App**: in Nora's new ticket, the bot now remembers the order, the city and the email preference.
+4. **App**: Erik asks what he ordered. The bot knows nothing about Erik: search only looks at Erik's memories.
 5. **App**: in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
 
 ## Under the hood
