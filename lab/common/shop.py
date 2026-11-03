@@ -27,7 +27,8 @@ Policies:
 Rules:
 - Answer in at most 3 short sentences. Be warm and concrete.
 - You cannot look up orders in a system. Rely on what the customer says in this conversation{{memory_hint}}.
-- If you do not know something about the customer, say so and ask. Never invent order details."""
+- Contact details are on file. Never ask for them.
+- If you cannot answer, say a teammate will check and follow up. Only ask the customer for things they would know, like an order number. Never invent order details."""
 
 
 def system_prompt(memories: list[str] | None = None) -> str:
