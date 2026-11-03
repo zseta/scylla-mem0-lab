@@ -21,6 +21,7 @@ tabs:
   hostname: scylladb
   port: 8501
 timelimit: 7200
+difficulty: ""
 enhanced_loading: null
 ---
 

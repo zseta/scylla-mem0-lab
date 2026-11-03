@@ -10,13 +10,20 @@ ROOT="$(git rev-parse --show-toplevel)"
 TRACK=(instruqt lab/intro.md 'lab/exercise/*/lab.md' lab/build-instruqt.sh)
 ZERO=0000000000000000000000000000000000000000
 
+# Does the track differ between $1 and $2 (or the working tree)? track.yml's checksum line
+# doesn't count: the CLI rewrites it on every push.
+track_changed() {
+  ! git diff --quiet "$@" -- "${TRACK[@]}" ':!instruqt/track.yml' ||
+    [ -n "$(git diff -U0 "$@" -- instruqt/track.yml | grep -E '^[-+][^-+]' | grep -vE '^[-+]checksum:')" ]
+}
+
 # stdin: one "<local ref> <local sha> <remote ref> <remote sha>" line per pushed ref.
 push_sha=""
 while read -r _ local_sha remote_ref remote_sha; do
   [ "$remote_ref" = refs/heads/main ] && [ "$local_sha" != "$ZERO" ] || continue
   # Unchanged track, and the remote commit is known here: nothing to push.
   if [ "$remote_sha" != "$ZERO" ] && git cat-file -e "$remote_sha" 2>/dev/null \
-     && git diff --quiet "$remote_sha" "$local_sha" -- "${TRACK[@]}"; then
+     && ! track_changed "$remote_sha" "$local_sha"; then
     continue
   fi
   push_sha="$local_sha"
@@ -24,10 +31,8 @@ done
 [ -n "$push_sha" ] || exit 0
 
 # Instruqt gets the working tree, so it must match the commit going to GitHub.
-# track.yml's checksum line is exempt: the CLI rewrites it on every push.
 "$ROOT/lab/build-instruqt.sh" >/dev/null
-if ! git diff --quiet "$push_sha" -- "${TRACK[@]}" ':!instruqt/track.yml' \
-   || git diff -U0 "$push_sha" -- instruqt/track.yml | grep -E '^[-+][^-+]' | grep -vqE '^[-+]checksum:'; then
+if track_changed "$push_sha"; then
   echo "pre-push: the track differs from the commit being pushed. Commit it (assignment.md is rebuilt), then push again:" >&2
   git status --short -- "${TRACK[@]}" >&2
   exit 1
