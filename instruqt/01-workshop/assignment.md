@@ -20,12 +20,13 @@ tabs:
   type: service
   hostname: scylladb
   port: 8501
-- title: Code
+- id: 3h00xrh82pug
+  title: Code
   type: code
   hostname: scylladb
   path: /root/mem0-lab/lab
-timelimit: 7200
 difficulty: ""
+timelimit: 7200
 enhanced_loading: null
 ---
 
