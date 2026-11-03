@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Pushes the Instruqt track when `git push` sends track changes to main.
+# The sandbox clones the lab code from main at startup, so only the track (instruqt/) needs pushing.
+# Enable once per clone: git config core.hooksPath .githooks
+# Skip: git push --no-verify, or SKIP_INSTRUQT=1 git push
+set -euo pipefail
+[ -n "${SKIP_INSTRUQT:-}" ] && exit 0
+
+ROOT="$(git rev-parse --show-toplevel)"
+TRACK=(instruqt lab/intro.md 'lab/exercise/*/lab.md' lab/build-instruqt.sh)
+ZERO=0000000000000000000000000000000000000000
+
+# stdin: one "<local ref> <local sha> <remote ref> <remote sha>" line per pushed ref.
+push_sha=""
+while read -r _ local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = refs/heads/main ] && [ "$local_sha" != "$ZERO" ] || continue
+  # Unchanged track, and the remote commit is known here: nothing to push.
+  if [ "$remote_sha" != "$ZERO" ] && git cat-file -e "$remote_sha" 2>/dev/null \
+     && git diff --quiet "$remote_sha" "$local_sha" -- "${TRACK[@]}"; then
+    continue
+  fi
+  push_sha="$local_sha"
+done
+[ -n "$push_sha" ] || exit 0
+
+# Instruqt gets the working tree, so it must match the commit going to GitHub.
+# track.yml's checksum line is exempt: the CLI rewrites it on every push.
+"$ROOT/lab/build-instruqt.sh" >/dev/null
+if ! git diff --quiet "$push_sha" -- "${TRACK[@]}" ':!instruqt/track.yml' \
+   || git diff -U0 "$push_sha" -- instruqt/track.yml | grep -E '^[-+][^-+]' | grep -vqE '^[-+]checksum:'; then
+  echo "pre-push: the track differs from the commit being pushed. Commit it (assignment.md is rebuilt), then push again:" >&2
+  git status --short -- "${TRACK[@]}" >&2
+  exit 1
+fi
+
+echo "pre-push: pushing the Instruqt track"
+cd "$ROOT/instruqt"
+instruqt track push < /dev/null

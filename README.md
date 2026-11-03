@@ -18,4 +18,4 @@ exercise/03-add-memories/run.sh    # open http://localhost:8501
 ## Layout
 
 - `lab/`: exercises, shared code, setup scripts. Details in [lab/README.md](lab/README.md).
-- `instruqt/`: Instruqt track. Rebuild with `lab/build-instruqt.sh`, then `instruqt track push`.
+- `instruqt/`: Instruqt track. Rebuild with `lab/build-instruqt.sh`. `git push` to `main` also pushes it to Instruqt (`.githooks/pre-push`; enable once with `git config core.hooksPath .githooks`).
