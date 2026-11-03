@@ -20,6 +20,10 @@ tabs:
   type: service
   hostname: scylladb
   port: 8501
+- title: Code
+  type: code
+  hostname: scylladb
+  path: /root/mem0-lab/lab
 timelimit: 7200
 difficulty: ""
 enhanced_loading: null
@@ -58,7 +62,7 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
    ```
 
-2. [**App**](tab-2): click **▶ Play scenario**, then **Next ▶** for each message. The line above the chat shows who sends what next. Alice reports a late order, then opens a new ticket and asks for news.
+2. [**App**](tab-2): click **▶ Play scenario**, then **Next ▶** for each message. The line above the chat shows who sends what next. Nora reports a late order, then opens a new ticket and asks for news.
 3. [**App**](tab-2): read the reply in the new ticket. The bot asks for the order number again.
 4. Optional: write your own messages. Click **New ticket** in the sidebar to start a fresh conversation.
 
@@ -171,7 +175,7 @@ CREATE TABLE plushie_shop.memories_entities (
 | `run_id` | `text` | the ticket | the ticket |
 | `payload` | `text` (JSON) | memory text, metadata, timestamps | entity text and type, `linked_memory_ids` |
 
-An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Alice`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
+An entity is a name or topic that mem0 finds in a memory (with spaCy, not the LLM), for example `Nora`, `Oslo` or `gift wrapping`. Each entity row points to the memories that mention it. `search()` looks up the entities of the question too, and ranks their linked memories higher.
 
 On both tables, for each of `user_id`, `agent_id` and `run_id`, it creates two indexes:
 
@@ -194,7 +198,7 @@ The 6 indexes on `memories`. `memories_entities` gets the same 6, named `memorie
 | `memories_agent_id_idx` | secondary index | `agent_id` | `get_all()` for one bot |
 | `memories_run_id_idx` | secondary index | `run_id` | `get_all()` for one ticket |
 
-- `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Alice never ranks Bob's memories.
+- `((user_id), vector, ...)` is a **local vector index**: one small index per user, not one big global index. A search for Nora never ranks Erik's memories.
 - Indexes need a keyspace that is **RF-rack-valid**: the replication factor equals the number of racks. That is why the cluster has 3 racks.
 - mem0 keeps the change history of each memory in a local SQLite file (`lab/.data/history.db`), not in ScyllaDB.
 
@@ -230,14 +234,14 @@ mem0 v3 only **adds**. It never silently overwrites an old fact.
    cd ~/mem0-lab/lab/exercise/03-add-memories && ./run.sh
    ```
 
-2. [**App**](tab-2): reload the tab, then click **▶ Play scenario**. Alice sends her first message.
+2. [**App**](tab-2): reload the tab, then click **▶ Play scenario**. Nora sends her first message.
 3. [**App**](tab-2): in **Under the hood**, read the `mem0.add` step: the facts mem0 extracted, then the CQL. The `SELECT ... ANN OF` on `memories` is the deduplication lookup, then one `INSERT` per new fact. The statements on `memories_entities` link the entities.
 4. [**App**](tab-2): click **Next ▶** twice. In the new ticket, the bot still forgets: it writes memories but does not read them yet. That last message has no new facts, so `mem0.add` runs only the lookup.
-5. [**Terminal**](tab-0): look at Alice's memories in ScyllaDB.
+5. [**Terminal**](tab-0): look at Nora's memories in ScyllaDB.
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT id, payload FROM memories WHERE user_id = 'alice';"
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories_entities WHERE user_id = 'alice';"
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT id, payload FROM memories WHERE user_id = 'nora';"
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories_entities WHERE user_id = 'nora';"
    ```
 
 ### Under the hood
@@ -274,8 +278,8 @@ This is the standard memory loop: **search → prompt → LLM → add**.
    ```
 
 2. [**App**](tab-2): reload, then click **▶ Play scenario**.
-3. [**App**](tab-2): in Alice's new ticket, the bot now remembers the order, the city and the email preference.
-4. [**App**](tab-2): Bob asks what he ordered. The bot knows nothing about Bob: search only looks at Bob's memories.
+3. [**App**](tab-2): in Nora's new ticket, the bot now remembers the order, the city and the email preference.
+4. [**App**](tab-2): Erik asks what he ordered. The bot knows nothing about Erik: search only looks at Erik's memories.
 5. [**App**](tab-2): in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
 
 ### Under the hood
@@ -304,7 +308,7 @@ Real support has many customers, several bots and many tickets. mem0 tags every 
 
 | ID | In this shop | Example |
 |---|---|---|
-| `user_id` | the customer | `alice` |
+| `user_id` | the customer | `nora` |
 | `agent_id` | the bot | `shipping-bot`, `billing-bot` |
 | `run_id` | the ticket | `T-1004` |
 
@@ -324,14 +328,14 @@ memory.search(text, filters={"user_id": customer})
    ```
 
 2. [**App**](tab-2): reload, then click **▶ Play scenario**:
-   - Bob gives the shipping bot his office address in Oslo.
-   - Alice asks the shipping bot for her address, with scope **Bot only · agent_id**. The bot answers with **Bob's** address.
-   - Alice asks again, with scope **Customer · user_id**. Now look at what she gets back.
+   - Erik gives the shipping bot his office address in Oslo.
+   - Nora asks the shipping bot for her address, with scope **Bot only · agent_id**. The bot answers with **Erik's** address.
+   - Nora asks again, with scope **Customer · user_id**. Now look at what she gets back.
 3. [**App**](tab-2): in the sidebar, try each scope and ask: *Which address will you ship my order to?*
-4. [**Terminal**](tab-0): the leaked answer was stored as Alice's memory. Find it:
+4. [**Terminal**](tab-0): the leaked answer was stored as Nora's memory. Find it:
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep -i oslo
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'nora';" | grep -i oslo
    ```
 
 ### Under the hood
@@ -349,7 +353,7 @@ SELECT ... WHERE user_id = ? AND agent_id = ? ORDER BY vector ANN OF ? LIMIT 5 A
 ```
 
 - Scoping by `agent_id` alone searches everything that bot ever heard, from every customer.
-- A wrong read becomes a wrong write: `add()` stored the leaked reply as a fact about Alice. Exercise 06 cleans it up.
+- A wrong read becomes a wrong write: `add()` stored the leaked reply as a fact about Nora. Exercise 06 cleans it up.
 - `search()` without any of the three IDs fails. mem0 and the ScyllaDB provider both require a scope.
 
 **Takeaway:** always scope by `user_id`. Narrow with `agent_id` or `run_id` when it makes sense.
@@ -378,12 +382,12 @@ This exercise adds a **Rep dashboard** tab for a human support rep.
    cd ~/mem0-lab/lab/exercise/06-memory-lifecycle && ./run.sh
    ```
 
-2. [**App**](tab-2): reload, then click **▶ Play scenario**. Alice moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
-3. [**App**](tab-2): open **Rep dashboard** (customer `alice`):
-   - **Delete** the memories about Berlin and the Oslo office, and the leaked "User's name is Bob".
+2. [**App**](tab-2): reload, then click **▶ Play scenario**. Nora moves to Lisbon, then asks where her next order ships. The bot sees Berlin, Oslo and Lisbon.
+3. [**App**](tab-2): open **Rep dashboard** (customer `nora`):
+   - **Delete** the memories about Berlin and the Oslo office, and the leaked "User's name is Erik".
    - **Edit** one memory, then click **History** on it.
 4. [**App**](tab-2): back in **Chat**, open a **New ticket** and ask *Which address will you ship my next order to?*
-5. Optional: select `bob`, tick the checkbox, and click **Forget bob · delete_all()**.
+5. Optional: select `erik`, tick the checkbox, and click **Forget erik · delete_all()**.
 
 ### Under the hood
 
@@ -430,14 +434,14 @@ The bot sets `category` from the ticket category in the sidebar, and `order_id` 
    ```
 
 2. [**App**](tab-2): reload, then click **▶ Play scenario**:
-   - a **billing** ticket: Alice was charged twice,
+   - a **billing** ticket: Nora was charged twice,
    - a **product** ticket: is the plushie washable,
    - a **billing** ticket with **Search only this category** on: only billing memories come back.
 3. [**App**](tab-2): turn the filter off and on, and ask the same question. Compare the `mem0.search` results.
 4. [**Terminal**](tab-0): see where the metadata lives.
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'alice';" | grep category
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'nora';" | grep category
    ```
 
 ### Under the hood
@@ -480,14 +484,14 @@ memory.add(messages, user_id=customer, prompt=PRIVACY_INSTRUCTIONS)
    cd ~/mem0-lab/lab/exercise/08-custom-instructions && ./run.sh
    ```
 
-2. [**App**](tab-2): reload, then click **▶ Play scenario**. Bob sends the same message twice: card number, phone number, wool allergy.
+2. [**App**](tab-2): reload, then click **▶ Play scenario**. Erik sends the same message twice: card number, phone number, wool allergy.
    - **Privacy instructions OFF**: open the `mem0.add` step. The phone number and the allergy are stored.
    - **Privacy instructions ON**: only the order is stored.
 3. [**App**](tab-2): read the facts stored with privacy OFF once more. Did mem0 also store something the **bot** said, for example a product claim the bot made up?
-4. [**Terminal**](tab-0): check what ScyllaDB holds for Bob.
+4. [**Terminal**](tab-0): check what ScyllaDB holds for Erik.
 
    ```run,sh
-   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'bob';"
+   ~/mem0-lab/lab/cqlsh.sh -e "SELECT payload FROM memories WHERE user_id = 'erik';"
    ```
 
 ### Under the hood
@@ -586,7 +590,7 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
    ```
 
 4. [**Terminal**](tab-0): watch the health check: `nodes up: 2/3`, and every line still says `OK`.
-5. [**App**](tab-2): reload, click **▶ Play scenario**, then chat. The bot still remembers Alice. Click **Refresh status** to see `scylla-3` down.
+5. [**App**](tab-2): reload, click **▶ Play scenario**, then chat. The bot still remembers Nora. Click **Refresh status** to see `scylla-3` down.
 6. [**Terminal 2**](tab-1): bring the node back. It rejoins and catches up on the writes it missed.
 
    ```run,sh

@@ -58,7 +58,7 @@ Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 
 ## Instruqt
 
-`../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2** and **App** (port 8501), no check scripts.
+`../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2**, **App** (port 8501) and **Code** (file browser on `lab/`), no check scripts.
 
 - `track_scripts/setup-scylladb` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
 - After editing any `lab.md`, run `./build-instruqt.sh` and commit. `git push` to `main` then runs `instruqt track push` from the `pre-push` hook, if the track changed. Enable the hook once per clone: `git config core.hooksPath .githooks`. Skip it with `SKIP_INSTRUQT=1 git push`.
