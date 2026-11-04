@@ -10,12 +10,13 @@ echo
 
 mkdir -p "$LAB_DIR/.data"
 cd "$HERE"
-# A fresh cluster can be slow with schema changes and time out. Every statement is IF NOT EXISTS, so retry.
+# A fresh cluster can be slow with schema changes and time out, and the Vector Store can take a moment
+# to pick up a new index ("don't support provided restrictions"). Every statement is IF NOT EXISTS, so retry.
 for attempt in 1 2 3; do
   if PYTHONPATH="$LAB_DIR" uv run --project "$LAB_DIR" --quiet python connect.py 2> "$LAB_DIR/.data/connect.log"; then
     exit 0
   fi
-  grep -q OperationTimedOut "$LAB_DIR/.data/connect.log" && [ "$attempt" -lt 3 ] || break
+  grep -qE "OperationTimedOut|support provided restrictions" "$LAB_DIR/.data/connect.log" && [ "$attempt" -lt 3 ] || break
   echo "ScyllaDB is still busy with the schema changes. Retrying..."
 done
 tail -20 "$LAB_DIR/.data/connect.log"

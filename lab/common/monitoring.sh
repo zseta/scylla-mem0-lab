@@ -34,10 +34,13 @@ start() {
 EOF
   cd "$DIR"
   ./kill-all.sh > /dev/null 2>&1 || true
+  # Grafana 13 downloads its core plugins into grafana/plugins at startup and swaps them in while running,
+  # which breaks the Prometheus datasource ("Could not load plugin"). Use the bundled ones instead.
+  git clean -fdq grafana/plugins
   # --scrap 5: scrape every 5s instead of 20s, so a stopped node shows up quickly.
   ./start-all.sh -v "$SCYLLA_VERSION" -s prometheus/scylla_servers.yml \
     --no-loki --no-alertmanager --no-renderer --allow-embedding --scrap 5 \
-    -D "--network $NETWORK"
+    -c GF_PLUGINS_PREINSTALL_DISABLED=true -D "--network $NETWORK"
   echo "Monitoring is running on port 3000. Open the Monitoring tab."
 }
 
