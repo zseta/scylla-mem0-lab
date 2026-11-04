@@ -26,7 +26,7 @@ mem0, with its ScyllaDB provider, is already installed in this lab.
 
 ## Under the hood
 
-`keyspace.cql` creates the keyspace first, with 3 replicas:
+mem0 creates the keyspace if it is missing, with the cluster's default replication. To customize it (replication factor, datacenters, tablets), create it yourself first. Here `keyspace.cql` does that, with 3 replicas:
 
 ```sql
 CREATE KEYSPACE IF NOT EXISTS plushie_shop
@@ -88,4 +88,4 @@ The 6 indexes on `memories`. `memories_entities` gets the same 6, named `memorie
 - Indexes need a keyspace that is **RF-rack-valid**: the replication factor equals the number of racks. That is why the cluster has 3 racks.
 - mem0 keeps the change history of each memory in a local SQLite file (`lab/.data/history.db`), not in ScyllaDB.
 
-**Takeaway:** mem0 manages the schema. You choose the replication.
+**Takeaway:** mem0 manages the schema, keyspace included. Create the keyspace yourself only to customize it.
