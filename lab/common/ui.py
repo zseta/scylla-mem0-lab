@@ -6,13 +6,13 @@ Streamlit's own widgets get the same colors from run_app.sh.
 
 import base64
 import html
-import itertools
+import threading
 import time
 
 import streamlit as st
 
 from common import cql_trace, gemini
-from common.config import ASSETS_DIR, CUSTOMERS, GEMINI_MODEL
+from common.config import ASSETS_DIR, CUSTOMERS, DATA_DIR, GEMINI_MODEL
 from common.shop import BOT_NAME, SHOP_NAME
 from common.turn import Turn
 
@@ -61,6 +61,7 @@ h1, h2, h3 {{ color: var(--text-emphasis); letter-spacing: -0.01em; }}
               color: var(--text-emphasis); background: var(--bg-accent); border-radius: 6px; padding: 4px 10px; margin: 10px 0 4px; }}
 .step-head .ms {{ font-family: 'Roboto Mono', monospace; color: var(--text-link); white-space: nowrap; }}
 .cql-ms {{ font-family: 'Roboto Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin: -6px 0 6px 2px; }}
+.cql-ms .why {{ font-family: 'Roboto Flex', sans-serif; color: var(--text-emphasis); }}
 .ticket-note {{ text-align: center; font-size: 0.8rem; color: var(--text-muted); margin: 8px 0; }}
 .next-step {{ font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 6px; }}
 .next-step b {{ color: var(--text-emphasis); }}
@@ -148,7 +149,19 @@ def _rate_limit_notice(seconds):
 
 # ---------- conversations and tickets ----------
 
-_ticket_numbers = itertools.count(1001)
+TICKET_FILE = DATA_DIR / "last_ticket"  # tickets are run_ids in mem0: keep them unique across exercises and restarts
+_ticket_lock = threading.Lock()
+
+
+def _next_ticket_number() -> int:
+    with _ticket_lock:
+        try:
+            number = int(TICKET_FILE.read_text()) + 1
+        except (FileNotFoundError, ValueError):
+            number = 1001
+        DATA_DIR.mkdir(exist_ok=True)
+        TICKET_FILE.write_text(str(number))
+        return number
 
 
 def _state():
@@ -165,9 +178,7 @@ def _state():
 
 def new_ticket(customer: str) -> str:
     s = _state()
-    ticket = f"T-{next(_ticket_numbers)}"
-    while ticket in s.conversations:
-        ticket = f"T-{next(_ticket_numbers)}"
+    ticket = f"T-{_next_ticket_number()}"
     s.tickets[customer] = ticket
     s.conversations[ticket] = []
     return ticket
@@ -350,14 +361,16 @@ def under_the_hood(turn: Turn | None):
                     st.markdown(f"- {line}")
             else:
                 st.caption(str(step.detail))
-        show_cql(step.cql)
+        show_cql(step.cql, step.name)
 
 
-def show_cql(events, limit=6):
-    for e in events[:limit]:
+def show_cql(events, step_name, limit=6):
+    for i, e in enumerate(events[:limit]):
         st.code(cql_trace.format_event(e), language="sql", wrap_lines=True)
         ms = f"{e.elapsed_ms:.1f} ms" if e.elapsed_ms is not None else "pending"
-        st.markdown(f'<div class="cql-ms">{ms}{" · ERROR " + e.error if e.error else ""}</div>', unsafe_allow_html=True)
+        reason = cql_trace.why(e, step_name, events[:i])
+        why = f'<span class="why">{html.escape(reason)}</span> · ' if reason else ""
+        st.markdown(f'<div class="cql-ms">{why}{ms}{" · ERROR " + e.error if e.error else ""}</div>', unsafe_allow_html=True)
     if len(events) > limit:
         with st.expander(f"{len(events) - limit} more statements"):
             for e in events[limit:]:

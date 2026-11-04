@@ -94,6 +94,37 @@ def since(position: int) -> list[CqlEvent]:
         return list(_events[position:])
 
 
+def why(event: CqlEvent, step: str, earlier: list[CqlEvent]) -> str:
+    """A few words on why mem0 sent this statement, given the step it ran in ("mem0.search", ...)."""
+    q = event.query.upper()
+    entities = "_ENTITIES" in q  # memories_entities: names mem0 found in memories
+    action = step.split()[0]
+    deleting = action in ("mem0.delete", "mem0.delete_all")
+    if q.startswith("SELECT") and "ANN OF" in q:
+        if entities:
+            return "Find memories mentioning this name" if action == "mem0.search" else "Is this name already stored?"
+        if any("ANN OF" in e.query.upper() and "_ENTITIES" not in e.query.upper() for e in earlier):
+            return "Filters dropped rows: fetch more"
+        return "Existing memories, to skip duplicates" if action == "mem0.add" else "Find memories similar to the message"
+    if q.startswith("SELECT"):
+        if "WHERE ID = ?" in q:
+            return "Read the memory first"
+        if entities:
+            return "Find names linked to this memory" if deleting else "Load known names (entities)"
+        return "Find every memory to delete" if deleting else "List the customer's memories"
+    if q.startswith("INSERT"):
+        return "Store a new name (entity)" if entities else "Store the new memory"
+    if q.startswith("UPDATE"):
+        if not entities:
+            return "Save new text and vector"
+        if deleting:
+            return "Unlink name from deleted memory"
+        return "Update the name's memory links" if action == "mem0.update" else "Link name to this memory"
+    if q.startswith("DELETE"):
+        return "Drop name, no memories left" if entities else "Delete the memory"
+    return ""
+
+
 def format_event(event: CqlEvent) -> str:
     """One statement as readable CQL, with bound values as a comment."""
     text = event.query

@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # Start over: stop the app, delete all memories and their history.
 # Keeps the cluster running. Run exercise 02 again afterwards.
-# Add --all to also remove the cluster containers.
+# Add --all to also remove the cluster containers and stop monitoring.
 set -euo pipefail
 LAB_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 pkill -f "streamlit run app.py" 2>/dev/null || true
-rm -f "$LAB_DIR/.data/history.db"
+rm -f "$LAB_DIR/.data/history.db" "$LAB_DIR/.data/last_ticket"
 if docker ps --format '{{.Names}}' | grep -qx scylla-1; then
-  docker exec scylla-1 cqlsh -e "DROP KEYSPACE IF EXISTS plushie_shop"
+  docker exec scylla-1 cqlsh --request-timeout=120 -e "DROP KEYSPACE IF EXISTS plushie_shop"
   echo "Dropped keyspace plushie_shop."
 fi
 if [ "${1:-}" = "--all" ]; then
+  "$LAB_DIR/common/monitoring.sh" stop   # first: its containers hold on to the cluster network
   docker compose -f "$LAB_DIR/exercise/01-start-scylladb/docker-compose.yml" down
 fi
 echo "Reset done."

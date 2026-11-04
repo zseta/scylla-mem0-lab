@@ -1,4 +1,4 @@
-"""Exercise 07: tag memories with metadata, then filter searches on it.
+"""Exercise 06: tag memories with metadata, then filter searches on it.
 
 add(metadata={...}) stores extra fields with each memory.
 search(filters={...}) can filter on them, next to user_id / agent_id / run_id.
@@ -45,7 +45,7 @@ def respond(text, ctx, history, turn):
     if ctx["filter_on"]:
         filters["category"] = ctx["category"]
     with turn.step("mem0.search") as s:
-        found = memory.search(text, filters=filters, top_k=5)["results"]
+        found = memory.search(text, filters=filters, top_k=10)["results"]
         s.detail = [f"filters = {filters}"] + [
             f'{m["memory"]} · {(m.get("metadata") or {}).get("category", "-")} · score {m["score"]:.2f}' for m in found
         ]
@@ -68,7 +68,7 @@ def respond(text, ctx, history, turn):
     return reply
 
 
-ui.page("07", "Metadata and filters")
+ui.page("06", "Metadata and filters")
 ui.apply_scenario_step(SCENARIO)
 ctx = ui.sidebar(show_bot=True, controls=controls)
 ui.chat(ctx, respond, SCENARIO)

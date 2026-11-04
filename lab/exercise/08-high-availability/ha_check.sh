@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Exercise 10: write + read a memory every second at QUORUM. Ctrl+C to stop.
+# Exercise 08: write + read a memory every second at QUORUM. Ctrl+C to stop.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 LAB_DIR="$(cd "$HERE/../.." && pwd)"

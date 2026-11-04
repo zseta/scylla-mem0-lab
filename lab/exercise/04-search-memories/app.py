@@ -10,10 +10,7 @@ from common import gemini, shop, ui
 from common.memory import create_memory
 
 SCENARIO = [
-    {"customer": "nora", "new_ticket": True,
-     "say": "Hi, I'm Nora. My order #4821, a large Scylla plushie, still hasn't arrived. I live in Berlin."},
-    {"say": "Please send updates by email, not phone. Thanks!"},
-    {"new_ticket": True, "say": "Hi again! Any news about my order?"},
+    {"customer": "nora", "new_ticket": True, "say": "Hi again! Any news about my order?"},
     {"customer": "erik", "new_ticket": True, "say": "Hi! Do you remember what I ordered?"},
 ]
 
@@ -29,7 +26,7 @@ memory = get_memory()
 def respond(text, ctx, history, turn):
     # NEW: look up what we know about this customer, before answering.
     with turn.step("mem0.search") as s:
-        found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=5)["results"]
+        found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found for this customer."
 
     with turn.step("Gemini: reply") as s:

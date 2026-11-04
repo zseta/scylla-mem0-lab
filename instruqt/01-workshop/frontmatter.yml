@@ -3,7 +3,7 @@ slug: workshop
 id: nn9yqtiktt8y
 type: challenge
 title: Agent memory with mem0 and ScyllaDB
-teaser: From a bot with no memory to a highly available memory layer, in 11 exercises.
+teaser: From a bot with no memory to a highly available memory layer, in 9 exercises.
 tabs:
 - id: b7ledbdcrp9t
   title: Terminal
@@ -20,6 +20,10 @@ tabs:
   type: service
   hostname: scylladb
   port: 8501
+- type: service
+  title: Monitoring
+  hostname: scylladb
+  port: 3000
 - id: 3h00xrh82pug
   title: Code
   type: code

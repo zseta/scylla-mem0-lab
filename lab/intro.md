@@ -6,6 +6,7 @@ You start with a bot that forgets everything between tickets. In each exercise y
 
 - **Terminal**: run the commands. Use **Terminal 2** when one command keeps running.
 - **App**: the bot (Streamlit). Reload this tab after each `./run.sh`.
+- **Monitoring**: ScyllaDB Monitoring (Grafana). Starts in exercise 01.
 
 **Each exercise**
 
@@ -13,4 +14,4 @@ You start with a bot that forgets everything between tickets. In each exercise y
 2. Open the **App** tab and click **▶ Play scenario**, then **Next ▶** for each message. Or chat yourself.
 3. Read **Under the hood** on the right: each step of a turn, with its CQL and latency.
 
-You need a Gemini API key. Get one for free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Playing every scenario once uses about 45 Gemini calls (about 170k tokens). Each message you type adds 2 calls.
+You need a Gemini API key. Get one for free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Playing every scenario once uses about 30 Gemini calls (about 130k tokens). Each message you type adds 2 calls.

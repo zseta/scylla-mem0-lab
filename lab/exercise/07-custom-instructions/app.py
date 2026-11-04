@@ -1,6 +1,6 @@
-"""Exercise 08: control WHAT mem0 remembers with custom instructions.
+"""Exercise 07: control WHAT mem0 remembers with custom instructions.
 
-By default mem0 keeps any fact that looks useful, including a card number.
+By default mem0 keeps any fact that looks useful, including a phone number or a health condition.
 custom_instructions tell the extraction step what to keep and what to drop.
 Set them once in the config, or per call with add(prompt=...), as here.
 """
@@ -13,15 +13,17 @@ from common.memory import create_memory
 PRIVACY_INSTRUCTIONS = """\
 Only remember facts that help customer support of a plushie shop:
 orders, products, shipping city and address, contact preferences, problems and their status.
-Never remember payment card numbers, expiry dates, CVV codes, passwords, phone numbers
-or health information. Leave them out completely, do not paraphrase them."""
+Never remember phone numbers or health information.
+Leave them out completely, do not paraphrase them."""
 
-SENSITIVE = ("Hi, I'm Erik. Charge my card 4111 1111 1111 1111, expiry 12/28, for a Scylla Plushie Family. "
+SENSITIVE = ("Hi, I'm {name}. I'd like to order a Scylla Plushie Family. "
              "Call me at +47 555 01234 when it ships. I'm allergic to wool, is the plushie wool-free?")
 
+# Two customers, so the second run starts without the first one's memories.
 SCENARIO = [
-    {"customer": "erik", "bot": "billing-bot", "privacy": False, "new_ticket": True, "say": SENSITIVE},
-    {"privacy": True, "new_ticket": True, "say": SENSITIVE},
+    {"customer": "erik", "bot": "shipping-bot", "privacy": False, "new_ticket": True,
+     "say": SENSITIVE.format(name="Erik")},
+    {"customer": "nora", "privacy": True, "new_ticket": True, "say": SENSITIVE.format(name="Nora")},
 ]
 
 
@@ -43,7 +45,7 @@ def controls(sb):
 
 def respond(text, ctx, history, turn):
     with turn.step("mem0.search") as s:
-        found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=5)["results"]
+        found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found."
 
     with turn.step("Gemini: reply"):
@@ -60,7 +62,7 @@ def respond(text, ctx, history, turn):
     return reply
 
 
-ui.page("08", "Custom instructions: control what is remembered")
+ui.page("07", "Custom instructions: control what is remembered")
 ui.apply_scenario_step(SCENARIO)
 ctx = ui.sidebar(show_bot=True, controls=controls)
 ui.chat(ctx, respond, SCENARIO)

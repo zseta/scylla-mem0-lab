@@ -24,10 +24,13 @@ The nodes are deliberately small (`--smp 1 --memory 1G`), so the whole cluster f
 
    Want to explore further? `~/mem0-lab/lab/cqlsh.sh` opens an interactive CQL shell. Type `exit` to leave.
 
+3. **Monitoring**: reload. The **Overview** dashboard shows 3 nodes. You come back here in exercise 08.
+
 ## What happened
 
 - `docker-compose.yml` starts `scylla-1`, then `scylla-2` and `scylla-3` join the cluster through the seed node.
 - Every node points to the Vector Store (`--vector-store-primary-uri`), so any node can serve vector queries.
+- `run.sh` also starts [ScyllaDB Monitoring](https://monitoring.docs.scylladb.com/): Prometheus reads each node's metrics (port 9180) every 5 seconds, and Grafana shows them.
 - ScyllaDB uses a shard-per-core design: each CPU core owns a slice of the data. A token-aware, shard-aware driver sends each request straight to a replica and the core that owns the row. Here each node has one core. In production you run bigger nodes.
 
 **Takeaway:** the database is up, with 3 replicas across 3 racks. The bot does not use it yet.

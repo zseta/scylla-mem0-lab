@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Exercise 01: start a 3-node ScyllaDB cluster plus the Vector Store service.
+# Exercise 01: start a 3-node ScyllaDB cluster plus the Vector Store service, then ScyllaDB Monitoring.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -11,3 +11,7 @@ echo "Cluster status (UN = Up and Normal):"
 docker exec scylla-1 nodetool status
 echo
 docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}' --filter name=scylla- --filter name=lab-vector-store
+
+echo
+echo "Starting ScyllaDB Monitoring (Prometheus + Grafana)..."
+../../common/monitoring.sh start

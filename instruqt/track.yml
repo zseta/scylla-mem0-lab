@@ -5,8 +5,8 @@ teaser: Give an AI support bot a memory with mem0, stored in a 3-node ScyllaDB c
 description: |-
   Start with a support bot that forgets everything between tickets. Add mem0 step by step:
   add and search memories, scope them by customer, bot and ticket, update and delete them,
-  tag them with metadata, control what gets remembered, then measure performance and stop
-  a ScyllaDB node to see high availability. Every step shows the CQL mem0 runs on ScyllaDB.
+  tag them with metadata, control what gets remembered, then stop a ScyllaDB node to see
+  high availability. Every step shows the CQL mem0 runs on ScyllaDB.
 icon: https://cdn.instruqt.com/assets/templates/ubuntu.png
 tags:
 - scylladb

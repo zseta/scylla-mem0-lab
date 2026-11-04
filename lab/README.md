@@ -7,24 +7,22 @@ A support bot for the ScyllaDB Plushie Shop. It starts with no memory, and each 
 ```
 lab/
   setup.sh             pre-start: Docker, uv, Python 3.14, deps, embedding model, images
-  reset.sh             drop all memories (--all: also remove the cluster)
+  reset.sh             drop all memories (--all: also remove the cluster and monitoring)
   cqlsh.sh             cqlsh on scylla-1, in the lab keyspace
   build-instruqt.sh    intro.md + exercise/*/lab.md -> ../instruqt/01-workshop/assignment.md
   intro.md             assignment intro
   pyproject.toml       dependencies (mem0 pinned to the ScyllaDB provider PR commit)
-  common/              shared code: config, CQL capture, Gemini wrapper, Streamlit UI, assets
+  common/              shared code: config, CQL capture, Gemini wrapper, Streamlit UI, assets, monitoring.sh
   exercise/
     00-run-the-bot/        app.py           bot with no memory
-    01-start-scylladb/     docker-compose   3 nodes, 3 racks + Vector Store
+    01-start-scylladb/     docker-compose   3 nodes, 3 racks + Vector Store, starts monitoring
     02-connect-mem0/       connect.py       keyspace RF=3, mem0 creates its schema
     03-add-memories/       app.py           add()
     04-search-memories/    app.py           search()
-    05-scoping/            app.py           user_id / agent_id / run_id, wrong-scope leak
-    06-memory-lifecycle/   app.py           rep dashboard: get_all, update, delete, history, delete_all
-    07-metadata/           app.py           metadata + filters
-    08-custom-instructions/ app.py          what gets remembered
-    09-performance/        app.py, load.sh  add() in the background; seed + benchmark (no LLM)
-    10-high-availability/  app.py, ha_check.sh  QUORUM, stop a node
+    05-memory-lifecycle/   app.py           rep dashboard: get_all, update, delete, history, delete_all
+    06-metadata/           app.py           metadata + filters
+    07-custom-instructions/ app.py          what gets remembered
+    08-high-availability/  app.py, ha_check.sh  QUORUM, stop a node
 ```
 
 Each exercise folder has `run.sh` (the one command) and `lab.md` (lesson + steps). Each `app.py` is a full copy of the bot at that stage, so `diff exercise/03-*/app.py exercise/04-*/app.py` shows exactly what changed.
@@ -35,6 +33,7 @@ Each exercise folder has `run.sh` (the one command) and `lab.md` (lesson + steps
 |---|---|
 | ScyllaDB | `scylladb/scylla:2026.3.4`, 3 nodes, `--smp 1 --memory 1G`, one rack each |
 | Vector Store | `scylladb/vector-store:1.14.0` |
+| Monitoring | [scylla-monitoring](https://github.com/scylladb/scylla-monitoring) `4.16.3`, dashboards `2026.3`, Prometheus + Grafana only, Grafana on port 3000, scrape every 5s. Cloned to `lab/.data/scylla-monitoring` |
 | mem0 | `zseta/mem0@5ffebb1` (PR mem0ai/mem0#5373, ScyllaDB provider) |
 | LLM | Gemini `gemini-3.5-flash-lite` (override with `GEMINI_MODEL`) |
 | Embeddings | `BAAI/bge-small-en-v1.5`, 384 dims, CPU |
@@ -54,15 +53,17 @@ exercise/02-connect-mem0/run.sh
 exercise/03-add-memories/run.sh       # then open http://localhost:8501
 ```
 
+Grafana: http://localhost:3000 (started by exercise 01).
+
 Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 
 ## Instruqt
 
-`../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2**, **App** (port 8501) and **Code** (file browser on `lab/`), no check scripts.
+`../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2**, **App** (port 8501), **Monitoring** (Grafana, port 3000) and **Code** (file browser on `lab/`), no check scripts.
 
 - `track_scripts/setup-scylladb` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
 - After editing any `lab.md`, run `./build-instruqt.sh` and commit. `git push` to `main` then runs `instruqt track push` from the `pre-push` hook, if the track changed. Enable the hook once per clone: `git config core.hooksPath .githooks`. Skip it with `SKIP_INSTRUQT=1 git push`.
 
 ## Gemini usage
 
-Each chat turn is 2 Gemini calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 45 calls and 170k tokens (measured). Exercises 09 and 10 load and check data with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.
+Each chat turn is 2 Gemini calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 30 calls and 130k tokens. The exercise 08 health check writes with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.

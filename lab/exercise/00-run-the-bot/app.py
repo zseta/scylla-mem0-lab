@@ -9,7 +9,6 @@ from common import gemini, shop, ui
 SCENARIO = [
     {"customer": "nora", "new_ticket": True,
      "say": "Hi, I'm Nora. My order #4821, a large Scylla plushie, still hasn't arrived. I live in Berlin."},
-    {"say": "Please send updates by email, not phone. Thanks!"},
     {"new_ticket": True, "say": "Hi again! Any news about my order?"},
 ]
 

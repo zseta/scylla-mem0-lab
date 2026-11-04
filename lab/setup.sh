@@ -34,6 +34,9 @@ uv run --project "$LAB_DIR" python -c \
 # 6. Docker images for exercise 01
 docker compose -f "$LAB_DIR/exercise/01-start-scylladb/docker-compose.yml" pull
 
+# 7. ScyllaDB Monitoring: clone it and pull Prometheus + Grafana (started in exercise 01)
+bash "$LAB_DIR/common/monitoring.sh" install
+
 mkdir -p "$LAB_DIR/.data"
 chmod +x "$LAB_DIR"/*.sh "$LAB_DIR"/common/*.sh "$LAB_DIR"/exercise/*/*.sh
 echo "Lab setup complete."

@@ -1,4 +1,4 @@
-# 10 · High availability: lose a node, keep the memory
+# 08 · High availability: lose a node, keep the memory
 
 The keyspace has 3 replicas of every row, one per rack. This bot reads and writes at **QUORUM**: 2 of the 3 replicas must answer. With one node down, 2 replicas still answer, so nothing fails.
 
@@ -12,13 +12,13 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
 1. **Terminal**: start this exercise's bot. The sidebar shows each node's status.
 
    ```run,sh
-   cd ~/mem0-lab/lab/exercise/10-high-availability && ./run.sh
+   cd ~/mem0-lab/lab/exercise/08-high-availability && ./run.sh
    ```
 
 2. **Terminal**: start the health check. Every second it writes a memory and reads it back at QUORUM. Leave it running.
 
    ```run,sh
-   ~/mem0-lab/lab/exercise/10-high-availability/ha_check.sh
+   ~/mem0-lab/lab/exercise/08-high-availability/ha_check.sh
    ```
 
 3. **Terminal 2**: stop one node.
@@ -29,12 +29,15 @@ set_consistency(memory, ConsistencyLevel.QUORUM)   # every mem0 read and write
    ```
 
 4. **Terminal**: watch the health check: `nodes up: 2/3`, and every line still says `OK`.
-5. **App**: reload, click **▶ Play scenario**, then chat. The bot still remembers Nora. Click **Refresh status** to see `scylla-3` down.
-6. **Terminal 2**: bring the node back. It rejoins and catches up on the writes it missed.
+5. **Monitoring**: within about 10 seconds, the **Overview** dashboard shows a red **Unreachable Nodes** box and **Unreachable 1**. Reads and writes from the health check continue.
+6. **App**: reload, then click **▶ Play scenario**. With `scylla-3` down, the bot reads Nora's address, stores a delivery note, and finds it again in a new ticket. Click **Refresh status** to see `scylla-3` down.
+7. **Terminal 2**: bring the node back. It rejoins and catches up on the writes it missed.
 
    ```run,sh
    docker start scylla-3
    ```
+
+8. **Monitoring**: open the **Detailed** dashboard and scroll to **Hints Written**. It rose while `scylla-3` was down: the other nodes saved its writes as hints. **Hints sent** spikes when it comes back and receives them.
 
 ## Under the hood
 

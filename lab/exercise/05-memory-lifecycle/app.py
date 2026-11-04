@@ -1,4 +1,4 @@
-"""Exercise 06: manage the memory lifecycle from a rep dashboard.
+"""Exercise 05: manage the memory lifecycle from a rep dashboard.
 
 mem0 v3 only ADDs memories. When a fact changes ("I moved"), the old fact stays.
 Fixing that is the application's job:
@@ -33,10 +33,11 @@ memory = get_memory()
 def respond(text, ctx, history, turn):
     filters = {"user_id": ctx["customer"]}
     with turn.step("mem0.search") as s:
-        found = memory.search(text, filters=filters, top_k=5)["results"]
+        found = memory.search(text, filters=filters, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found."
     with turn.step("Gemini: reply"):
         reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+    # NEW: every memory now records who said it, to which bot, in which ticket.
     with turn.step("mem0.add") as s:
         result = memory.add(
             [{"role": "user", "content": text}, {"role": "assistant", "content": reply}],
@@ -59,7 +60,7 @@ def run_action(name, fn):
 
 def show_history(memory_id):
     changes = memory.history(memory_id)
-    return [f'{c["created_at"][:19]} · {c["event"]}: {c.get("old_memory") or "-"} → {c.get("new_memory") or "-"}'
+    return [f'{(c.get("updated_at") or c["created_at"])[:19]} · {c["event"]}: {c.get("old_memory") or "-"} → {c.get("new_memory") or "-"}'
             for c in changes] or "No history."
 
 
@@ -98,7 +99,7 @@ def dashboard(ctx):
         ui.under_the_hood(st.session_state.get("dash_turn") or listing)
 
 
-ui.page("06", "Memory lifecycle: update, delete, history")
+ui.page("05", "Memory lifecycle: update, delete, history")
 ui.apply_scenario_step(SCENARIO)
 ctx = ui.sidebar(show_bot=True)
 chat_tab, dash_tab = st.tabs(["Chat", "Rep dashboard"])
