@@ -22,6 +22,20 @@ fi
 set +x  # keep the AWS keys out of the setup log
 export PATH="/root/.local/bin:$PATH"
 LAB_DIR=/root/mem0-lab/lab
+
+# On a VM the account variables can live in a profile file instead of this script's environment.
+if [ -z "${INSTRUQT_AWS_ACCOUNT_SANDBOX_AWS_ACCESS_KEY_ID:-}" ]; then
+  for f in $(grep -ls INSTRUQT_AWS_ACCOUNT_SANDBOX /etc/environment /etc/profile.d/* /root/.bashrc /root/.profile 2>/dev/null); do
+    echo "Loading the AWS account variables from $f"
+    set +u -a; . "$f"; set -u +a
+  done
+fi
+echo "AWS account variables: $(compgen -v | grep '^INSTRUQT_AWS' | tr '\n' ' ')"
+if [ -z "${INSTRUQT_AWS_ACCOUNT_SANDBOX_AWS_ACCESS_KEY_ID:-}" ]; then
+  echo "No AWS account in this sandbox. Exercise 00 will ask for a Gemini API key."
+  exit 0
+fi
+
 mkdir -p /root/.aws
 cat > /root/.aws/credentials <<CREDS
 [default]
