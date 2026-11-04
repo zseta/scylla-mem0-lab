@@ -20,8 +20,9 @@ tabs:
   type: service
   hostname: scylladb
   port: 8501
-- type: service
+- id: vy7kqqucaxdk
   title: Monitoring
+  type: service
   hostname: scylladb
   port: 3000
 - id: 3h00xrh82pug
