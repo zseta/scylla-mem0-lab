@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Pushes the Instruqt track when `git push` sends track changes to main.
+# Scans the pushed commits for secrets (gitleaks), then pushes the Instruqt track when
+# `git push` sends track changes to main.
 # The sandbox clones the lab code from main at startup, so only the track (instruqt/) needs pushing.
 # Enable once per clone: git config core.hooksPath .githooks
-# Skip: git push --no-verify, or SKIP_INSTRUQT=1 git push
+# Skip: git push --no-verify, or SKIP_INSTRUQT=1 git push (skips the track push only)
 set -euo pipefail
-[ -n "${SKIP_INSTRUQT:-}" ] && exit 0
 
 ROOT="$(git rev-parse --show-toplevel)"
 TRACK=(instruqt lab/intro.md 'lab/exercise/*/lab.md' lab/build-instruqt.sh)
@@ -18,8 +18,27 @@ track_changed() {
 }
 
 # stdin: one "<local ref> <local sha> <remote ref> <remote sha>" line per pushed ref.
+mapfile -t REFS
+
+# Block the push if a commit the remote doesn't have yet contains a secret.
+if command -v gitleaks >/dev/null; then
+  for ref in "${REFS[@]}"; do
+    read -r _ local_sha _ _ <<< "$ref"
+    [ "$local_sha" != "$ZERO" ] || continue
+    if ! gitleaks git "$ROOT" -v --redact --no-banner --log-level warn --log-opts="$local_sha --not --remotes=$1"; then
+      echo "pre-push: gitleaks found a secret (above). Remove it from the commits, then push again." >&2
+      exit 1
+    fi
+  done
+else
+  echo "pre-push: gitleaks is not installed, skipping the secret scan" >&2
+fi
+
+[ -n "${SKIP_INSTRUQT:-}" ] && exit 0
+
 push_sha=""
-while read -r _ local_sha remote_ref remote_sha; do
+for ref in "${REFS[@]}"; do
+  read -r _ local_sha remote_ref remote_sha <<< "$ref"
   [ "$remote_ref" = refs/heads/main ] && [ "$local_sha" != "$ZERO" ] || continue
   # Unchanged track, and the remote commit is known here: nothing to push.
   if [ "$remote_sha" != "$ZERO" ] && git cat-file -e "$remote_sha" 2>/dev/null \
