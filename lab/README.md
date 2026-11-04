@@ -62,7 +62,7 @@ Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 `../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2**, **App** (port 8501), **Monitoring** (Grafana, port 3000) and **Code** (file browser on `lab/`), no check scripts.
 
 - `track_scripts/setup-scylladb` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
-- `config.yml` gives each sandbox its own AWS account (`aws_accounts: sandbox`, Bedrock only). The setup script writes the learner's keys to `/root/.aws/credentials`, submits Anthropic's one-time use case form with the admin keys, and runs `common/check_llm.py`. When it passes, it writes `LLM_PROVIDER=bedrock` to `lab/.env`. When it fails, exercise 00 asks for a Gemini key.
+- `config.yml` gives each sandbox its own AWS account (`aws_accounts: sandbox`). Learners can read its keys, so its policy allows only Claude Haiku 4.5 through the `us.` inference profile, and there are no admin keys. `service_limits` caps tokens per play: Instruqt stops a play that goes over. Changing `BEDROCK_MODEL` on Instruqt also needs that policy changed. The setup script writes the keys to `/root/.aws/credentials`, submits Anthropic's one-time use case form, and runs `common/check_llm.py`. When it passes, it writes `LLM_PROVIDER=bedrock` to `lab/.env`. When it fails, exercise 00 asks for a Gemini key.
 - After editing any `lab.md`, run `./build-instruqt.sh` and commit. `git push` to `main` then runs `instruqt track push` from the `pre-push` hook, if the track changed. Enable the hook once per clone: `git config core.hooksPath .githooks`. Skip it with `SKIP_INSTRUQT=1 git push`.
 
 ## LLM usage

@@ -44,10 +44,9 @@ aws_secret_access_key = ${INSTRUQT_AWS_ACCOUNT_SANDBOX_AWS_SECRET_ACCESS_KEY}
 CREDS
 printf '[default]\nregion = us-east-1\n' > /root/.aws/config
 
-# Claude models need Anthropic's one-time use case form in each new AWS account. Submit it with the admin keys.
-AWS_ACCESS_KEY_ID="$INSTRUQT_AWS_ACCOUNT_SANDBOX_ADMIN_AWS_ACCESS_KEY_ID" \
-AWS_SECRET_ACCESS_KEY="$INSTRUQT_AWS_ACCOUNT_SANDBOX_ADMIN_AWS_SECRET_ACCESS_KEY" \
-  uv run --project "$LAB_DIR" --quiet python - <<'PY' || echo "Could not submit the Anthropic use case form."
+# Claude models need Anthropic's one-time use case form in each new AWS account.
+# The learner policy in config.yml allows submitting it, so this uses the keys in /root/.aws/credentials.
+uv run --project "$LAB_DIR" --quiet python - <<'PY' || echo "Could not submit the Anthropic use case form."
 import json
 import boto3
 from botocore.exceptions import ClientError

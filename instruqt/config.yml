@@ -13,36 +13,64 @@ aws_accounts:
   regions:
   - us-east-1
   - us-east-2
+  - us-west-1
   - us-west-2
+  # The learner's keys are readable on the VM, so they only get what the bot needs:
+  # Claude Haiku 4.5 through the us. inference profile (routes within the four US regions).
   iam_policy: |
     {
       "Version": "2012-10-17",
       "Statement": [
         {
-          "Sid": "InvokeModels",
+          "Sid": "InvokeHaiku45",
           "Effect": "Allow",
           "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-          "Resource": ["arn:aws:bedrock:*::foundation-model/*", "arn:aws:bedrock:*:*:inference-profile/*"]
+          "Resource": [
+            "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0",
+            "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+            "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+            "arn:aws:bedrock:us-west-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+            "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0"
+          ]
         },
         {
-          "Sid": "DiscoverModels",
+          "Sid": "ListModels",
           "Effect": "Allow",
-          "Action": [
-            "bedrock:ListFoundationModels",
-            "bedrock:GetFoundationModel",
-            "bedrock:ListInferenceProfiles",
-            "bedrock:GetInferenceProfile"
-          ],
+          "Action": ["bedrock:ListFoundationModels", "bedrock:GetFoundationModel"],
           "Resource": "*"
         },
         {
-          "Sid": "AutoEnableMarketplaceModels",
+          "Sid": "AnthropicUseCaseForm",
           "Effect": "Allow",
-          "Action": ["aws-marketplace:ViewSubscriptions", "aws-marketplace:Subscribe"],
+          "Action": ["bedrock:GetUseCaseForModelAccess", "bedrock:PutUseCaseForModelAccess"],
           "Resource": "*"
+        },
+        {
+          "Sid": "ViewMarketplaceSubscriptions",
+          "Effect": "Allow",
+          "Action": "aws-marketplace:ViewSubscriptions",
+          "Resource": "*"
+        },
+        {
+          "Sid": "SubscribeToHaiku45Only",
+          "Effect": "Allow",
+          "Action": "aws-marketplace:Subscribe",
+          "Resource": "*",
+          "Condition": {"StringEquals": {"aws-marketplace:ProductId": "prod-xdkflymybwmvi"}}
         }
       ]
     }
+  # Instruqt denies every other model and stops the play when it goes over these totals.
+  # Playing every scenario once was ~130k tokens on Gemini (not yet measured on Claude). These caps leave
+  # room for replays, typing and tokenizer differences. Worst case per play at Haiku 4.5 prices
+  # ($1 in / $5 out per million): about $7.50.
+  service_limits:
+    bedrock:
+      models:
+      - model: anthropic.claude-haiku-4-5-20251001-v1:0
+        limits:
+          input_token_count: 5000000
+          output_token_count: 500000
   scp_policy: |
     {
       "Version": "2012-10-17",
@@ -62,5 +90,3 @@ aws_accounts:
         }
       ]
     }
-  admin_managed_policies:
-  - arn:aws:iam::aws:policy/AdministratorAccess
