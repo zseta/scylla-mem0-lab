@@ -11,7 +11,7 @@ Fixing that is the application's job:
 
 import streamlit as st
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 from common.memory import create_memory
 from common.turn import Turn
 
@@ -35,8 +35,8 @@ def respond(text, ctx, history, turn):
     with turn.step("mem0.search") as s:
         found = memory.search(text, filters=filters, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found."
-    with turn.step("Gemini: reply"):
-        reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+    with turn.step("LLM: reply"):
+        reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
     # NEW: every memory now records who said it, to which bot, in which ticket.
     with turn.step("mem0.add") as s:
         result = memory.add(

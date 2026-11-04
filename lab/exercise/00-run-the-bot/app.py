@@ -4,7 +4,7 @@ Each reply sees only the messages of the current ticket.
 Open a new ticket and the bot has forgotten everything.
 """
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 
 SCENARIO = [
     {"customer": "nora", "new_ticket": True,
@@ -14,9 +14,9 @@ SCENARIO = [
 
 
 def respond(text, ctx, history, turn):
-    with turn.step("Gemini: reply") as s:
+    with turn.step("LLM: reply") as s:
         s.detail = f"Prompt = system prompt + {len(history)} messages of this ticket. No memory."
-        return gemini.chat_reply(shop.system_prompt(), history, text)
+        return llm.chat_reply(shop.system_prompt(), history, text)
 
 
 ui.page("00", "A support bot with no memory")

@@ -12,7 +12,7 @@ lab/
   build-instruqt.sh    intro.md + exercise/*/lab.md -> ../instruqt/01-workshop/assignment.md
   intro.md             assignment intro
   pyproject.toml       dependencies (mem0 pinned to the ScyllaDB provider PR commit)
-  common/              shared code: config, CQL capture, Gemini wrapper, Streamlit UI, assets, monitoring.sh
+  common/              shared code: config, CQL capture, LLM wrapper (Bedrock or Gemini), Streamlit UI, assets, monitoring.sh
   exercise/
     00-run-the-bot/        app.py           bot with no memory
     01-start-scylladb/     docker-compose   3 nodes, 3 racks + Vector Store, starts monitoring
@@ -35,7 +35,7 @@ Each exercise folder has `run.sh` (the one command) and `lab.md` (lesson + steps
 | Vector Store | `scylladb/vector-store:1.14.0` |
 | Monitoring | [scylla-monitoring](https://github.com/scylladb/scylla-monitoring) `4.16.3`, dashboards `2026.3`, Prometheus + Grafana only, Grafana on port 3000, scrape every 5s. Cloned to `lab/.data/scylla-monitoring` |
 | mem0 | `zseta/mem0@5ffebb1` (PR mem0ai/mem0#5373, ScyllaDB provider) |
-| LLM | Gemini `gemini-3.5-flash-lite` (override with `GEMINI_MODEL`) |
+| LLM | Instruqt: Claude Haiku 4.5 on Amazon Bedrock, `us.anthropic.claude-haiku-4-5-20251001-v1:0` (override with `BEDROCK_MODEL`). Fallback and local: Gemini `gemini-3.5-flash-lite` (override with `GEMINI_MODEL`). `LLM_PROVIDER=bedrock` in `lab/.env` picks Bedrock |
 | Embeddings | `BAAI/bge-small-en-v1.5`, 384 dims, CPU |
 | UI | Streamlit on port 8501, ScyllaDB Design System colors |
 | Python | 3.14 via uv, CPU-only torch |
@@ -47,7 +47,7 @@ Needs Docker and [uv](https://docs.astral.sh/uv/). On Linux, run several ScyllaD
 ```bash
 cd lab
 uv sync
-exercise/00-run-the-bot/run.sh        # asks for the Gemini key once, saves lab/.env
+exercise/00-run-the-bot/run.sh        # asks for the Gemini key once, saves lab/.env (locally the bot uses Gemini)
 exercise/01-start-scylladb/run.sh
 exercise/02-connect-mem0/run.sh
 exercise/03-add-memories/run.sh       # then open http://localhost:8501
@@ -62,8 +62,9 @@ Logs: `lab/.data/app.log`. Start over: `./reset.sh`, then exercise 02 again.
 `../instruqt/` holds the track: one VM (`scylladb`), one challenge with every exercise, tabs **Terminal**, **Terminal 2**, **App** (port 8501), **Monitoring** (Grafana, port 3000) and **Code** (file browser on `lab/`), no check scripts.
 
 - `track_scripts/setup-scylladb` clones the repo to `/root/mem0-lab` and runs `lab/setup.sh`. Repo: https://github.com/zseta/scylla-mem0-lab.
+- `config.yml` gives each sandbox its own AWS account (`aws_accounts: sandbox`, Bedrock only). The setup script writes the learner's keys to `/root/.aws/credentials`, submits Anthropic's one-time use case form with the admin keys, and runs `common/check_llm.py`. When it passes, it writes `LLM_PROVIDER=bedrock` to `lab/.env`. When it fails, exercise 00 asks for a Gemini key.
 - After editing any `lab.md`, run `./build-instruqt.sh` and commit. `git push` to `main` then runs `instruqt track push` from the `pre-push` hook, if the track changed. Enable the hook once per clone: `git config core.hooksPath .githooks`. Skip it with `SKIP_INSTRUQT=1 git push`.
 
-## Gemini usage
+## LLM usage
 
-Each chat turn is 2 Gemini calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 30 calls and 130k tokens. The exercise 08 health check writes with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.
+Each chat turn is 2 LLM calls: the reply and mem0's fact extraction (about 8k input tokens). Playing every scenario once is about 30 calls and 130k tokens. The exercise 08 health check writes with `add(infer=False)`, which uses no LLM. Rate-limit errors (429) are retried automatically, and the sidebar counts calls and tokens.

@@ -7,7 +7,7 @@ Set them once in the config, or per call with add(prompt=...), as here.
 
 import streamlit as st
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 from common.memory import create_memory
 
 PRIVACY_INSTRUCTIONS = """\
@@ -48,8 +48,8 @@ def respond(text, ctx, history, turn):
         found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found."
 
-    with turn.step("Gemini: reply"):
-        reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+    with turn.step("LLM: reply"):
+        reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
 
     # NEW: custom instructions for the fact extraction
     with turn.step("mem0.add · privacy " + ("ON" if ctx["privacy"] else "OFF")) as s:

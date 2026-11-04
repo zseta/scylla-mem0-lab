@@ -11,8 +11,8 @@ import time
 
 import streamlit as st
 
-from common import cql_trace, gemini
-from common.config import ASSETS_DIR, CUSTOMERS, DATA_DIR, GEMINI_MODEL
+from common import cql_trace, llm
+from common.config import ASSETS_DIR, CUSTOMERS, DATA_DIR
 from common.shop import BOT_NAME, SHOP_NAME
 from common.turn import Turn
 
@@ -137,12 +137,12 @@ def page(exercise: str, title: str):
         '<span class="to-dark">☾<span class="label"> Dark</span></span></button></div>' + THEME_JS,
         unsafe_allow_javascript=True,
     )
-    gemini.on_rate_limit = _rate_limit_notice
+    llm.on_rate_limit = _rate_limit_notice
 
 
 def _rate_limit_notice(seconds):
     try:
-        st.toast(f"Gemini rate limit hit. Retrying in {seconds}s...")
+        st.toast(f"{llm.NAME} rate limit hit. Retrying in {seconds}s...")
     except Exception:
         pass
 
@@ -216,10 +216,10 @@ def sidebar(show_bot=False, controls=None) -> dict:
 
 
 def _usage(sb):
-    u = gemini.usage
+    u = llm.usage
     sb.divider()
     sb.caption(
-        f"Gemini `{GEMINI_MODEL}` · {u['calls']} calls "
+        f"{llm.NAME} `{llm.MODEL}` · {u['calls']} calls "
         f"({u['by_purpose'].get('reply', 0)} replies, {u['by_purpose'].get('mem0', 0)} mem0) · "
         f"{u['input_tokens'] + u['output_tokens']:,} tokens"
     )

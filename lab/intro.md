@@ -14,4 +14,4 @@ You start with a bot that forgets everything between tickets. In each exercise y
 2. Open the **App** tab and click **▶ Play scenario**, then **Next ▶** for each message. Or chat yourself.
 3. Read **Under the hood** on the right: each step of a turn, with its CQL and latency.
 
-You need a Gemini API key. Get one for free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Playing every scenario once uses about 30 Gemini calls (about 130k tokens). Each message you type adds 2 calls.
+The bot runs on **Claude Haiku 4.5 on Amazon Bedrock**, in an AWS account created for this lab. You need no API key. If Bedrock does not answer, exercise 00 asks for a Gemini API key instead (free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Playing every scenario once uses about 30 LLM calls. Each message you type adds 2 calls.

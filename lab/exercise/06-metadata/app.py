@@ -8,7 +8,7 @@ import re
 
 import streamlit as st
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 from common.memory import create_memory
 
 CATEGORIES = ["shipping", "billing", "product"]
@@ -50,8 +50,8 @@ def respond(text, ctx, history, turn):
             f'{m["memory"]} · {(m.get("metadata") or {}).get("category", "-")} · score {m["score"]:.2f}' for m in found
         ]
 
-    with turn.step("Gemini: reply"):
-        reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+    with turn.step("LLM: reply"):
+        reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
 
     # NEW: tag the memories of this turn
     metadata = {"category": ctx["category"]}

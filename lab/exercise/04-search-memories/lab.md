@@ -4,7 +4,7 @@ Before it answers, the bot asks mem0 what it knows about the customer and puts t
 
 ```python
 found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
-reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
 ```
 
 This is the standard memory loop: **search → prompt → LLM → add**.
@@ -20,7 +20,7 @@ This is the standard memory loop: **search → prompt → LLM → add**.
 2. **App**: reload, then click **▶ Play scenario**. Nora opens a new ticket and asks for news, like at the end of exercise 03.
 3. **App**: this time the bot knows her order number and that she wants email. Open the `mem0.search` step: these are the memories exercise 03 stored.
 4. **App**: click **Next ▶**. Erik asks what he ordered. The bot knows nothing about Erik: search only looks at Erik's memories.
-5. **App**: in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
+5. **App**: in **Under the hood**, compare the `mem0.search` time with the `LLM: reply` time.
 
 ## Under the hood
 

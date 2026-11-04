@@ -1,12 +1,12 @@
 # 00 · Run the support bot (no memory)
 
-Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on Gemini and answers questions about orders, shipping and returns.
+Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on an LLM (Claude on Amazon Bedrock) and answers questions about orders, shipping and returns.
 
 It has no memory. Each reply sees only the messages of the current ticket. When the customer opens a new ticket, the bot starts from zero. That is the problem this workshop solves.
 
 ## Exercise
 
-1. **Terminal**: start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
+1. **Terminal**: start the bot. It checks that the LLM answers first. If Bedrock does not answer, it asks for a Gemini API key ([get one here](https://aistudio.google.com/apikey)).
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
@@ -18,8 +18,8 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
 
 ## What happened
 
-- Every turn sends one prompt to Gemini: the system prompt plus the messages of this ticket.
-- The **Under the hood** panel shows one step per turn: `Gemini: reply`. No database is involved yet.
-- The sidebar counts Gemini calls and tokens, so you can keep an eye on your quota.
+- Every turn sends one prompt to the LLM: the system prompt plus the messages of this ticket.
+- The **Under the hood** panel shows one step per turn: `LLM: reply`. No database is involved yet.
+- The sidebar counts LLM calls and tokens.
 
 **Takeaway:** chat history is not memory. The next exercises give the bot a memory that outlives the ticket.

@@ -4,3 +4,63 @@ virtualmachines:
   image: scylladb/vector-2026-3-4
   shell: /bin/bash
   machine_type: n2-standard-2
+# One AWS account per learner, deleted when the lab ends. The bot calls Claude on Amazon Bedrock with it.
+aws_accounts:
+- name: sandbox
+  services:
+  - bedrock
+  - sts
+  regions:
+  - us-east-1
+  - us-east-2
+  - us-west-2
+  iam_policy: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Sid": "InvokeModels",
+          "Effect": "Allow",
+          "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+          "Resource": ["arn:aws:bedrock:*::foundation-model/*", "arn:aws:bedrock:*:*:inference-profile/*"]
+        },
+        {
+          "Sid": "DiscoverModels",
+          "Effect": "Allow",
+          "Action": [
+            "bedrock:ListFoundationModels",
+            "bedrock:GetFoundationModel",
+            "bedrock:ListInferenceProfiles",
+            "bedrock:GetInferenceProfile"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Sid": "AutoEnableMarketplaceModels",
+          "Effect": "Allow",
+          "Action": ["aws-marketplace:ViewSubscriptions", "aws-marketplace:Subscribe"],
+          "Resource": "*"
+        }
+      ]
+    }
+  scp_policy: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Sid": "DenyExpensiveBedrockFeatures",
+          "Effect": "Deny",
+          "Action": [
+            "bedrock:CreateProvisionedModelThroughput",
+            "bedrock:UpdateProvisionedModelThroughput",
+            "bedrock:CreateModelCustomizationJob",
+            "bedrock:CreateModelImportJob",
+            "bedrock:CreateModelInvocationJob",
+            "bedrock:CreateMarketplaceModelEndpoint"
+          ],
+          "Resource": "*"
+        }
+      ]
+    }
+  admin_managed_policies:
+  - arn:aws:iam::aws:policy/AdministratorAccess

@@ -1,7 +1,7 @@
 """Shared helpers for the mem0 + ScyllaDB workshop.
 
 Each exercise's app.py holds the lesson code (the mem0 calls).
-Everything that is plumbing lives here: config, CQL capture, Gemini wrapper, UI chrome.
+Everything that is plumbing lives here: config, CQL capture, LLM wrapper, UI chrome.
 """
 
 import os

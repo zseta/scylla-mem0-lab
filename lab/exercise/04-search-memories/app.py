@@ -6,7 +6,7 @@ limited to this customer's memories. The results go into the prompt.
 
 import streamlit as st
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 from common.memory import create_memory
 
 SCENARIO = [
@@ -29,9 +29,9 @@ def respond(text, ctx, history, turn):
         found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
         s.detail = [f'{m["memory"]} · score {m["score"]:.2f}' for m in found] or "Nothing found for this customer."
 
-    with turn.step("Gemini: reply") as s:
+    with turn.step("LLM: reply") as s:
         s.detail = f"Prompt = system prompt + {len(found)} memories + {len(history)} messages of this ticket."
-        reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+        reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
 
     with turn.step("mem0.add") as s:
         result = memory.add(

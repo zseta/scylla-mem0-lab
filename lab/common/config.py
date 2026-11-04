@@ -13,7 +13,13 @@ DATA_DIR = LAB_DIR / ".data"
 load_dotenv(LAB_DIR / ".env")
 load_dotenv(LAB_DIR.parent / ".env")
 
+# The LLM: Claude on Amazon Bedrock (the Instruqt track setup writes LLM_PROVIDER=bedrock to lab/.env),
+# or Gemini with your own key (the default, and the fallback when Bedrock does not answer).
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+BEDROCK_MODEL = os.getenv("BEDROCK_MODEL", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+LLM_MODEL = BEDROCK_MODEL if LLM_PROVIDER == "bedrock" else GEMINI_MODEL
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
 EMBEDDING_DIMS = 384
 
@@ -31,14 +37,23 @@ def google_api_key() -> str:
     return key
 
 
+def llm_config() -> dict:
+    if LLM_PROVIDER == "bedrock":
+        return {
+            "provider": "aws_bedrock",
+            "config": {"model": BEDROCK_MODEL, "temperature": 0.1, "aws_region": AWS_REGION},
+        }
+    return {
+        "provider": "gemini",
+        "config": {"model": GEMINI_MODEL, "temperature": 0.1, "api_key": google_api_key()},
+    }
+
+
 def mem0_config(**overrides) -> dict:
-    """mem0 config: Gemini for fact extraction, bge-small on CPU for embeddings, ScyllaDB for storage."""
+    """mem0 config: the LLM for fact extraction, bge-small on CPU for embeddings, ScyllaDB for storage."""
     DATA_DIR.mkdir(exist_ok=True)
     config = {
-        "llm": {
-            "provider": "gemini",
-            "config": {"model": GEMINI_MODEL, "temperature": 0.1, "api_key": google_api_key()},
-        },
+        "llm": llm_config(),
         "embedder": {
             "provider": "huggingface",
             "config": {"model": EMBEDDING_MODEL, "embedding_dims": EMBEDDING_DIMS},

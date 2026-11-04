@@ -51,19 +51,19 @@ You start with a bot that forgets everything between tickets. In each exercise y
 2. Open the [**App**](tab-2) tab and click **▶ Play scenario**, then **Next ▶** for each message. Or chat yourself.
 3. Read **Under the hood** on the right: each step of a turn, with its CQL and latency.
 
-You need a Gemini API key. Get one for free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Playing every scenario once uses about 30 Gemini calls (about 130k tokens). Each message you type adds 2 calls.
+The bot runs on **Claude Haiku 4.5 on Amazon Bedrock**, in an AWS account created for this lab. You need no API key. If Bedrock does not answer, exercise 00 asks for a Gemini API key instead (free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Playing every scenario once uses about 30 LLM calls. Each message you type adds 2 calls.
 
 ---
 
 ## 00 · Run the support bot (no memory)
 
-Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on Gemini and answers questions about orders, shipping and returns.
+Meet **plushie-bot**, the support bot of the ScyllaDB Plushie Shop. It runs on an LLM (Claude on Amazon Bedrock) and answers questions about orders, shipping and returns.
 
 It has no memory. Each reply sees only the messages of the current ticket. When the customer opens a new ticket, the bot starts from zero. That is the problem this workshop solves.
 
 ### Exercise
 
-1. [**Terminal**](tab-0): start the bot. It asks for your Gemini API key the first time ([get one here](https://aistudio.google.com/apikey)).
+1. [**Terminal**](tab-0): start the bot. It checks that the LLM answers first. If Bedrock does not answer, it asks for a Gemini API key ([get one here](https://aistudio.google.com/apikey)).
 
    ```run,sh
    cd ~/mem0-lab/lab/exercise/00-run-the-bot && ./run.sh
@@ -75,9 +75,9 @@ It has no memory. Each reply sees only the messages of the current ticket. When 
 
 ### What happened
 
-- Every turn sends one prompt to Gemini: the system prompt plus the messages of this ticket.
-- The **Under the hood** panel shows one step per turn: `Gemini: reply`. No database is involved yet.
-- The sidebar counts Gemini calls and tokens, so you can keep an eye on your quota.
+- Every turn sends one prompt to the LLM: the system prompt plus the messages of this ticket.
+- The **Under the hood** panel shows one step per turn: `LLM: reply`. No database is involved yet.
+- The sidebar counts LLM calls and tokens.
 
 **Takeaway:** chat history is not memory. The next exercises give the bot a memory that outlives the ticket.
 
@@ -128,7 +128,7 @@ mem0 is a memory layer for AI agents. It has three parts, all set in one config:
 
 | Part | This lab uses | Job |
 |---|---|---|
-| LLM | Gemini `gemini-3.5-flash-lite` | extracts facts from conversations |
+| LLM | Claude Haiku 4.5 on Amazon Bedrock (`provider: "aws_bedrock"`), or Gemini with your own key | extracts facts from conversations |
 | Embedder | `BAAI/bge-small-en-v1.5` on CPU, 384 dimensions | turns text into vectors |
 | Vector store | ScyllaDB (`provider: "scylladb"`) | stores and searches memories |
 
@@ -230,7 +230,7 @@ memory.add(
 What `add()` does:
 
 1. **Look up**: one vector search finds the 10 stored memories closest to the exchange.
-2. **Extract**: one Gemini call turns the exchange into short facts, for example "User prefers email communication". It sees those 10 memories, so it skips facts that are already stored.
+2. **Extract**: one LLM call turns the exchange into short facts, for example "User prefers email communication". It sees those 10 memories, so it skips facts that are already stored.
 3. **Embed**: bge-small turns each fact into a 384-dimension vector, on CPU.
 4. **Store**: it writes each fact to ScyllaDB, and links the entities (people, places, products) in `memories_entities`.
 
@@ -271,7 +271,7 @@ Before it answers, the bot asks mem0 what it knows about the customer and puts t
 
 ```python
 found = memory.search(text, filters={"user_id": ctx["customer"]}, top_k=10)["results"]
-reply = gemini.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
+reply = llm.chat_reply(shop.system_prompt([m["memory"] for m in found]), history, text)
 ```
 
 This is the standard memory loop: **search → prompt → LLM → add**.
@@ -287,7 +287,7 @@ This is the standard memory loop: **search → prompt → LLM → add**.
 2. [**App**](tab-2): reload, then click **▶ Play scenario**. Nora opens a new ticket and asks for news, like at the end of exercise 03.
 3. [**App**](tab-2): this time the bot knows her order number and that she wants email. Open the `mem0.search` step: these are the memories exercise 03 stored.
 4. [**App**](tab-2): click **Next ▶**. Erik asks what he ordered. The bot knows nothing about Erik: search only looks at Erik's memories.
-5. [**App**](tab-2): in **Under the hood**, compare the `mem0.search` time with the `Gemini: reply` time.
+5. [**App**](tab-2): in **Under the hood**, compare the `mem0.search` time with the `LLM: reply` time.
 
 ### Under the hood
 

@@ -4,7 +4,7 @@ mem0 is a memory layer for AI agents. It has three parts, all set in one config:
 
 | Part | This lab uses | Job |
 |---|---|---|
-| LLM | Gemini `gemini-3.5-flash-lite` | extracts facts from conversations |
+| LLM | Claude Haiku 4.5 on Amazon Bedrock (`provider: "aws_bedrock"`), or Gemini with your own key | extracts facts from conversations |
 | Embedder | `BAAI/bge-small-en-v1.5` on CPU, 384 dimensions | turns text into vectors |
 | Vector store | ScyllaDB (`provider: "scylladb"`) | stores and searches memories |
 

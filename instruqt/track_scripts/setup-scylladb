@@ -15,3 +15,53 @@ if [ ! -d /root/mem0-lab ]; then
   git clone --depth 1 --branch "$REPO_REF" "$REPO_URL" /root/mem0-lab
 fi
 /root/mem0-lab/lab/setup.sh
+
+# --- Amazon Bedrock ------------------------------------------------------------
+# config.yml gives every sandbox its own AWS account ("sandbox"). The bot calls Claude on Bedrock with the
+# learner's keys. If Bedrock does not answer, lab/.env gets no LLM_PROVIDER and exercise 00 asks for a Gemini key.
+set +x  # keep the AWS keys out of the setup log
+export PATH="/root/.local/bin:$PATH"
+LAB_DIR=/root/mem0-lab/lab
+mkdir -p /root/.aws
+cat > /root/.aws/credentials <<CREDS
+[default]
+aws_access_key_id = ${INSTRUQT_AWS_ACCOUNT_SANDBOX_AWS_ACCESS_KEY_ID}
+aws_secret_access_key = ${INSTRUQT_AWS_ACCOUNT_SANDBOX_AWS_SECRET_ACCESS_KEY}
+CREDS
+printf '[default]\nregion = us-east-1\n' > /root/.aws/config
+
+# Claude models need Anthropic's one-time use case form in each new AWS account. Submit it with the admin keys.
+AWS_ACCESS_KEY_ID="$INSTRUQT_AWS_ACCOUNT_SANDBOX_ADMIN_AWS_ACCESS_KEY_ID" \
+AWS_SECRET_ACCESS_KEY="$INSTRUQT_AWS_ACCOUNT_SANDBOX_ADMIN_AWS_SECRET_ACCESS_KEY" \
+  uv run --project "$LAB_DIR" --quiet python - <<'PY' || echo "Could not submit the Anthropic use case form."
+import json
+import boto3
+from botocore.exceptions import ClientError
+
+bedrock = boto3.client("bedrock", region_name="us-east-1")
+try:
+    bedrock.get_use_case_for_model_access()
+    print("Anthropic use case form: already on file.")
+except ClientError:
+    bedrock.put_use_case_for_model_access(formData=json.dumps({
+        "companyName": "ScyllaDB",
+        "companyWebsite": "https://www.scylladb.com",
+        "intendedUsers": "1",
+        "industryOption": "Technology",
+        "otherIndustryOption": "",
+        "useCases": "Hands-on training lab: workshop attendees run a demo support chatbot that uses an LLM "
+                    "to reply and to extract facts for its memory (mem0 + ScyllaDB). Temporary sandbox account.",
+    }).encode())
+    print("Anthropic use case form: submitted.")
+PY
+
+# New IAM keys and the form take a while to work everywhere. Retry the check for up to 5 minutes.
+for _ in $(seq 1 30); do
+  if (cd "$LAB_DIR" && LLM_PROVIDER=bedrock PYTHONPATH="$LAB_DIR" uv run --project "$LAB_DIR" --quiet python -m common.check_llm); then
+    grep -qs '^LLM_PROVIDER=bedrock' "$LAB_DIR/.env" || echo "LLM_PROVIDER=bedrock" >> "$LAB_DIR/.env"
+    echo "Bedrock works. The bot uses Claude on Bedrock."
+    exit 0
+  fi
+  sleep 10
+done
+echo "Bedrock did not answer. Exercise 00 will ask for a Gemini API key."

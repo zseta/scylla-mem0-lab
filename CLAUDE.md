@@ -21,4 +21,4 @@ exercise/NN-*/run.sh      # app on :8501, log in lab/.data/app.log
 ./reset.sh                # drop memories (--all: also the cluster)
 ```
 
-Needs `GOOGLE_API_KEY` in `lab/.env` or the repo-root `.env` (exercise 00 asks for it). No test suite; check changes by running the exercise.
+Locally the bot uses Gemini: needs `GOOGLE_API_KEY` in `lab/.env` or the repo-root `.env` (exercise 00 asks for it). On Instruqt it uses Claude on Amazon Bedrock (`LLM_PROVIDER=bedrock` in `lab/.env`, written by the track setup), with Gemini as the fallback. `PYTHONPATH=lab uv run --project lab python -m common.check_llm` checks the LLM. No test suite; check changes by running the exercise.

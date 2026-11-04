@@ -6,7 +6,8 @@ requires-python = ">=3.14,<3.15"
 dependencies = [
     # mem0 with the ScyllaDB vector store (PR mem0ai/mem0#5373), pinned to a commit.
     "mem0ai[scylladb,nlp] @ git+https://github.com/zseta/mem0.git@5ffebb17547a4491b55735284e012c802558471f",
-    "google-genai>=2.33.0",
+    "boto3>=1.40",  # Claude on Amazon Bedrock (the Instruqt sandbox has an AWS account)
+    "google-genai>=2.33.0",  # Gemini, the fallback: bring your own key
     "sentence-transformers>=6.2.0",
     "torch>=2.14.1",
     "streamlit>=1.66.1",

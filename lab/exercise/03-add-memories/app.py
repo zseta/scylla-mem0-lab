@@ -1,13 +1,13 @@
 """Exercise 03: the bot WRITES memories with mem0 add().
 
-After every turn, mem0 extracts facts from the exchange (one Gemini call),
+After every turn, mem0 extracts facts from the exchange (one LLM call),
 embeds them on CPU and stores them in ScyllaDB.
 The bot does not READ memories yet. That comes in exercise 04.
 """
 
 import streamlit as st
 
-from common import gemini, shop, ui
+from common import llm, shop, ui
 from common.memory import create_memory
 
 SCENARIO = [
@@ -27,9 +27,9 @@ memory = get_memory()
 
 
 def respond(text, ctx, history, turn):
-    with turn.step("Gemini: reply") as s:
+    with turn.step("LLM: reply") as s:
         s.detail = f"Prompt = system prompt + {len(history)} messages of this ticket. No memory read yet."
-        reply = gemini.chat_reply(shop.system_prompt(), history, text)
+        reply = llm.chat_reply(shop.system_prompt(), history, text)
 
     # NEW: store what was said. mem0 decides which facts are worth keeping.
     with turn.step("mem0.add") as s:

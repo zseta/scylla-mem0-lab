@@ -2,7 +2,7 @@
 
 import logging
 
-from common import cql_trace, gemini
+from common import cql_trace, llm
 from common.config import mem0_config
 
 # The ScyllaDB provider has no keyword (BM25) search yet; mem0 warns about it on every start.
@@ -11,7 +11,7 @@ logging.getLogger("mem0.memory.main").setLevel(logging.ERROR)
 
 def create_memory(**overrides):
     cql_trace.install()
-    gemini.install()
+    llm.install()
     from mem0 import Memory
 
     memory = Memory.from_config(mem0_config(**overrides))

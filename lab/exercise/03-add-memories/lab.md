@@ -12,7 +12,7 @@ memory.add(
 What `add()` does:
 
 1. **Look up**: one vector search finds the 10 stored memories closest to the exchange.
-2. **Extract**: one Gemini call turns the exchange into short facts, for example "User prefers email communication". It sees those 10 memories, so it skips facts that are already stored.
+2. **Extract**: one LLM call turns the exchange into short facts, for example "User prefers email communication". It sees those 10 memories, so it skips facts that are already stored.
 3. **Embed**: bge-small turns each fact into a 384-dimension vector, on CPU.
 4. **Store**: it writes each fact to ScyllaDB, and links the entities (people, places, products) in `memories_entities`.
 
