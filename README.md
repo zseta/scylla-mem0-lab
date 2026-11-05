@@ -2,9 +2,13 @@
 
 Hands-on workshop: give an AI support bot memory with [mem0](https://github.com/mem0ai/mem0), stored in a 3-node ScyllaDB cluster. Eleven exercises, each adding one mem0 feature and showing the CQL behind it.
 
-## Quick start
+## Guided workshop
 
-Needs Docker, [uv](https://docs.astral.sh/uv/), and a free [Gemini API key](https://aistudio.google.com/apikey).
+The lab is designed for the guided workshop on Instruqt: [bit.ly/scylla-mem0](https://bit.ly/scylla-mem0). It runs in your browser. The sandbox has the ScyllaDB cluster and Claude on Amazon Bedrock, so you do not need an API key.
+
+## Run locally
+
+To run the lab on your laptop, you need Docker, [uv](https://docs.astral.sh/uv/), and a free [Gemini API key](https://aistudio.google.com/apikey). Locally, the bot uses Gemini as its LLM.
 
 ```bash
 cd lab
