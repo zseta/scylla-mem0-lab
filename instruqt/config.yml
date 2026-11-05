@@ -61,15 +61,15 @@ aws_accounts:
       ]
     }
   # Instruqt denies every other model and stops the play when it goes over these totals.
-  # Playing every scenario once was ~130k tokens on Gemini (not yet measured on Claude). These caps leave
-  # room for replays, typing and tokenizer differences. Worst case per play at Haiku 4.5 prices
-  # ($1 in / $5 out per million): about $7.50.
+  # A play is ~115-135k tokens on Claude (12 chat turns: ~112k in / ~2.5k out, almost all of it mem0's
+  # extraction prompt), ~130k on Gemini. These caps leave about 4x room for replays and typing.
+  # Worst case per play at Haiku 4.5 prices ($1 in / $5 out per million): about $3.
   service_limits:
     bedrock:
       models:
       - model: anthropic.claude-haiku-4-5-20251001-v1:0
         limits:
-          input_token_count: 5000000
+          input_token_count: 500000
           output_token_count: 500000
   scp_policy: |
     {

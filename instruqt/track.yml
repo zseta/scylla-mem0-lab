@@ -7,7 +7,7 @@ description: |-
   add and search memories, scope them by customer, bot and ticket, update and delete them,
   tag them with metadata, control what gets remembered, then stop a ScyllaDB node to see
   high availability. Every step shows the CQL mem0 runs on ScyllaDB.
-icon: https://cdn.instruqt.com/assets/templates/ubuntu.png
+icon: https://avatars.githubusercontent.com/u/14364730?s=200&v=4
 tags:
 - scylladb
 - mem0
@@ -28,5 +28,5 @@ lab_config:
   hideStopButton: false
   default_layout: AssignmentLeft
   default_layout_sidebar_size: 33
-checksum: "9601852138409722838"
+checksum: "1697545878628920508"
 enhanced_loading: false
