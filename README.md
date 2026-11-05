@@ -4,7 +4,7 @@ Hands-on workshop: give an AI support bot memory with [mem0](https://github.com/
 
 ## Guided workshop
 
-The lab is designed for the guided workshop on Instruqt: [bit.ly/scylla-mem0](https://bit.ly/scylla-mem0). It runs in your browser. The sandbox has the ScyllaDB cluster and Claude on Amazon Bedrock, so you do not need an API key.
+The lab is designed for the guided workshop on Instruqt. The workshop runs in your browser and includes the ScyllaDB cluster.
 
 ## Run locally
 
